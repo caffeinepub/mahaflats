@@ -64,12 +64,12 @@ export default function ContactSection() {
                 <p className="text-xs text-muted-foreground">
                   Message Arman directly at{" "}
                   <a
-                    href="https://wa.me/919999999999"
+                    href="https://wa.me/917447428486"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary hover:underline font-medium"
                   >
-                    +91 99999 99999
+                    +91 7447428486
                   </a>
                 </p>
               </div>
