@@ -9,14 +9,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, IndianRupee, Loader2, Upload } from "lucide-react";
+import { CheckCircle2, IndianRupee, Loader2, Upload, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useRecordPayment, useSubmitProperty } from "../hooks/useQueries";
 
 const CITIES = ["Mumbai", "Pune", "Thane", "Nagpur", "Nashik"];
 const PROPERTY_TYPES = ["1BHK", "2BHK", "3BHK", "Villa", "Plot"];
+const MAX_PHOTOS = 5;
+const MAX_FILE_SIZE_MB = 5;
 
 type Step = 1 | 2 | 3;
 
@@ -24,6 +26,8 @@ export default function SellerForm() {
   const [step, setStep] = useState<Step>(1);
   const [propertyId, setPropertyId] = useState<bigint | null>(null);
   const [utr, setUtr] = useState("");
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     sellerName: "",
@@ -36,9 +40,7 @@ export default function SellerForm() {
     area: "",
     bedrooms: "",
     description: "",
-    photoUrls: [
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600",
-    ],
+    photoUrls: [] as string[],
   });
 
   const submitProperty = useSubmitProperty();
@@ -46,6 +48,83 @@ export default function SellerForm() {
 
   const update = (field: string, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
+
+  const handleFilesSelected = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const currentCount = photoPreviews.length;
+    const remaining = MAX_PHOTOS - currentCount;
+
+    if (remaining <= 0) {
+      toast.error(`Maximum ${MAX_PHOTOS} photos allowed.`);
+      return;
+    }
+
+    const filesToProcess = Array.from(files).slice(0, remaining);
+
+    if (files.length > remaining) {
+      toast.error(
+        `Only ${remaining} more photo(s) can be added (max ${MAX_PHOTOS} total).`,
+      );
+    }
+
+    const newPreviews: string[] = [];
+    let processed = 0;
+
+    for (const file of filesToProcess) {
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        toast.error(
+          `"${file.name}" exceeds ${MAX_FILE_SIZE_MB}MB limit and was skipped.`,
+        );
+        processed++;
+        if (processed === filesToProcess.length && newPreviews.length > 0) {
+          setPhotoPreviews((prev) => {
+            const updated = [...prev, ...newPreviews];
+            setForm((f) => ({ ...f, photoUrls: updated }));
+            return updated;
+          });
+        }
+        continue;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        newPreviews.push(dataUrl);
+        processed++;
+        if (processed === filesToProcess.length) {
+          setPhotoPreviews((prev) => {
+            const updated = [...prev, ...newPreviews];
+            setForm((f) => ({ ...f, photoUrls: updated }));
+            return updated;
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Reset file input so same file can be re-selected
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotoPreviews((prev) => {
+      const updated = prev.filter((_, i) => i !== index);
+      setForm((f) => ({ ...f, photoUrls: updated }));
+      return updated;
+    });
+  };
+
+  const handleDropzoneDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDropzoneDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    handleFilesSelected(e.dataTransfer.files);
+  };
 
   const handleStep1Submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -315,21 +394,93 @@ export default function SellerForm() {
                     />
                   </div>
 
+                  {/* Photo Upload */}
                   <div>
-                    <Label className="text-foreground">Property Photos</Label>
-                    <div
-                      data-ocid="seller_form.dropzone"
-                      className="mt-1 border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
-                    >
-                      <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">
-                        Photo upload will be available after listing
-                        confirmation
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        JPG, PNG, WebP up to 10MB each
-                      </p>
-                    </div>
+                    <Label className="text-foreground">
+                      Property Photos{" "}
+                      <span className="text-muted-foreground font-normal">
+                        ({photoPreviews.length}/{MAX_PHOTOS})
+                      </span>
+                    </Label>
+
+                    {/* Dropzone with overlaid file input for full mobile compatibility */}
+                    {photoPreviews.length < MAX_PHOTOS && (
+                      <div
+                        data-ocid="seller_form.dropzone"
+                        className="relative mt-1 w-full border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                        onDragOver={handleDropzoneDragOver}
+                        onDrop={handleDropzoneDrop}
+                      >
+                        {/* Transparent overlaid file input — directly triggered by user touch/click */}
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                          multiple
+                          data-ocid="seller_form.upload_button"
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          style={{ fontSize: 0 }}
+                          onChange={(e) => handleFilesSelected(e.target.files)}
+                          aria-label="Upload property photos"
+                        />
+                        <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2 pointer-events-none" />
+                        <span className="text-sm text-primary font-medium underline pointer-events-none">
+                          Tap to upload photos
+                        </span>
+                        <p className="text-xs text-muted-foreground mt-1 pointer-events-none">
+                          or drag and drop here
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1 pointer-events-none">
+                          JPG, PNG · Max {MAX_FILE_SIZE_MB}MB per photo · Up to{" "}
+                          {MAX_PHOTOS} photos
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Photo Previews */}
+                    {photoPreviews.length > 0 && (
+                      <div className="mt-3 grid grid-cols-3 sm:grid-cols-5 gap-2">
+                        {photoPreviews.map((src, i) => (
+                          <div
+                            key={src.slice(0, 40)}
+                            className="relative group aspect-square rounded-lg overflow-hidden border border-border"
+                          >
+                            <img
+                              src={src}
+                              alt={`Listing ${i + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removePhoto(i)}
+                              className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
+                              aria-label={`Remove listing ${i + 1}`}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                        {photoPreviews.length < MAX_PHOTOS && (
+                          <div
+                            className="relative aspect-square rounded-lg border-2 border-dashed border-border hover:border-primary/50 transition-colors flex items-center justify-center cursor-pointer"
+                            aria-label="Add more photos"
+                          >
+                            <input
+                              type="file"
+                              accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                              multiple
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                              style={{ fontSize: 0 }}
+                              onChange={(e) =>
+                                handleFilesSelected(e.target.files)
+                              }
+                              aria-label="Add more photos"
+                            />
+                            <Upload className="w-5 h-5 text-muted-foreground pointer-events-none" />
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <Button
@@ -467,6 +618,7 @@ export default function SellerForm() {
                   onClick={() => {
                     setStep(1);
                     setUtr("");
+                    setPhotoPreviews([]);
                     setForm({
                       sellerName: "",
                       sellerPhone: "",

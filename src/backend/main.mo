@@ -81,6 +81,7 @@ actor {
   let userProfiles = Map.empty<Principal, UserProfile>();
   var nextPropertyId = 1;
   var nextLeadId = 1;
+  stable var adminPassword : Text = "Mahaflats@2024";
 
   // User profile management functions
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -343,5 +344,17 @@ actor {
       Runtime.trap("Property not found");
     };
     properties.remove(propertyId);
+  };
+
+  // Admin password verification
+  public query func verifyAdminPassword(password : Text) : async Bool {
+    password == adminPassword;
+  };
+
+  public shared ({ caller }) func setAdminPassword(newPassword : Text) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can change the admin password");
+    };
+    adminPassword := newPassword;
   };
 };

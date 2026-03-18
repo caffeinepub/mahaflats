@@ -176,6 +176,8 @@ export interface backendInterface {
     submitProperty(title: string, city: string, location: string, propertyType: string, price: bigint, area: bigint, bedrooms: bigint, description: string, photoUrls: Array<string>, sellerName: string, sellerPhone: string): Promise<void>;
     toggleFeatured(propertyId: bigint): Promise<void>;
     updatePropertyStatus(propertyId: bigint, newStatus: PropertyStatus): Promise<void>;
+    verifyAdminPassword(password: string): Promise<boolean>;
+    setAdminPassword(newPassword: string): Promise<void>;
 }
 import type { PaymentStatus as _PaymentStatus, Property as _Property, PropertyStatus as _PropertyStatus, SellerInfo as _SellerInfo, Time as _Time, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -541,6 +543,32 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.updatePropertyStatus(arg0, to_candid_PropertyStatus_n23(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async verifyAdminPassword(password: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.verifyAdminPassword(password);
+                return result;
+            } catch (e) {
+                return this.processError(e);
+            }
+        } else {
+            const result = await this.actor.verifyAdminPassword(password);
+            return result;
+        }
+    }
+    async setAdminPassword(newPassword: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.setAdminPassword(newPassword);
+                return result;
+            } catch (e) {
+                return this.processError(e);
+            }
+        } else {
+            const result = await this.actor.setAdminPassword(newPassword);
             return result;
         }
     }

@@ -1,20 +1,22 @@
 import { Button } from "@/components/ui/button";
-import { Building2, LogIn, LogOut, Menu, X } from "lucide-react";
+import { Building2, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { useInternetIdentity } from "../hooks/useInternetIdentity";
-import { useIsAdmin } from "../hooks/useQueries";
 
 interface NavbarProps {
   onAdminClick: () => void;
+  onLogout: () => void;
   isAdminView: boolean;
+  isAdminSession: boolean;
 }
 
-export default function Navbar({ onAdminClick, isAdminView }: NavbarProps) {
+export default function Navbar({
+  onAdminClick,
+  onLogout,
+  isAdminView,
+  isAdminSession,
+}: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { login, clear, loginStatus, identity } = useInternetIdentity();
-  const { data: isAdmin } = useIsAdmin();
-  const isLoggedIn = loginStatus === "success" && !!identity;
 
   const scrollTo = (id: string) => {
     setMobileOpen(false);
@@ -76,46 +78,34 @@ export default function Navbar({ onAdminClick, isAdminView }: NavbarProps) {
           </button>
         </nav>
 
-        {/* Auth + Admin */}
+        {/* Admin controls (only visible when admin is logged in) */}
         <div className="hidden md:flex items-center gap-3">
-          {isLoggedIn ? (
+          {isAdminSession && (
             <>
-              {isAdmin && (
-                <Button
-                  data-ocid="nav.admin_link"
-                  variant={isAdminView ? "default" : "outline"}
-                  size="sm"
-                  onClick={onAdminClick}
-                  className={
-                    isAdminView
-                      ? "bg-primary text-primary-foreground"
-                      : "border-border text-foreground"
-                  }
-                >
-                  {isAdminView ? "Public View" : "Admin Dashboard"}
-                </Button>
-              )}
               <Button
+                data-ocid="nav.admin_link"
+                variant={isAdminView ? "default" : "outline"}
+                size="sm"
+                onClick={onAdminClick}
+                className={
+                  isAdminView
+                    ? "bg-primary text-primary-foreground"
+                    : "border-border text-foreground"
+                }
+              >
+                <LayoutDashboard className="w-4 h-4 mr-1" />
+                {isAdminView ? "Public View" : "Admin Dashboard"}
+              </Button>
+              <Button
+                data-ocid="nav.logout_button"
                 variant="ghost"
                 size="sm"
-                onClick={clear}
+                onClick={onLogout}
                 className="text-muted-foreground hover:text-foreground"
               >
                 <LogOut className="w-4 h-4 mr-1" /> Logout
               </Button>
             </>
-          ) : (
-            <Button
-              data-ocid="nav.admin_link"
-              variant="outline"
-              size="sm"
-              onClick={login}
-              disabled={loginStatus === "logging-in"}
-              className="border-border text-foreground hover:bg-secondary"
-            >
-              <LogIn className="w-4 h-4 mr-1" />
-              {loginStatus === "logging-in" ? "Logging in..." : "Admin Login"}
-            </Button>
           )}
         </div>
 
@@ -172,39 +162,32 @@ export default function Navbar({ onAdminClick, isAdminView }: NavbarProps) {
               >
                 Contact
               </button>
-              {isLoggedIn ? (
+              {isAdminSession && (
                 <>
-                  {isAdmin && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        onAdminClick();
-                        setMobileOpen(false);
-                      }}
-                      className="w-full"
-                    >
-                      {isAdminView ? "Public View" : "Admin Dashboard"}
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      onAdminClick();
+                      setMobileOpen(false);
+                    }}
+                    className="w-full"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-1" />
+                    {isAdminView ? "Public View" : "Admin Dashboard"}
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={clear}
+                    onClick={() => {
+                      onLogout();
+                      setMobileOpen(false);
+                    }}
                     className="w-full"
                   >
                     <LogOut className="w-4 h-4 mr-1" /> Logout
                   </Button>
                 </>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={login}
-                  className="w-full"
-                >
-                  <LogIn className="w-4 h-4 mr-1" /> Admin Login
-                </Button>
               )}
             </div>
           </motion.div>

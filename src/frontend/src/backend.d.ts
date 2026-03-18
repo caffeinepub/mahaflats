@@ -69,6 +69,8 @@ export interface backendInterface {
     getSellerPhone(propertyId: bigint): Promise<string | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
+    verifyAdminPassword(password: string): Promise<boolean>;
+    setAdminPassword(newPassword: string): Promise<void>;
     listApprovedProperties(): Promise<Array<Property>>;
     recordPayment(propertyId: bigint, paymentRef: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;

@@ -115,6 +115,8 @@ export interface _SERVICE {
     undefined
   >,
   'toggleFeatured' : ActorMethod<[bigint], undefined>,
+  'verifyAdminPassword' : ActorMethod<[string], boolean>,
+  'setAdminPassword' : ActorMethod<[string], undefined>,
   'updatePropertyStatus' : ActorMethod<[bigint, PropertyStatus], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;

@@ -8,7 +8,9 @@ const QUICK_LINKS = [
   { label: "Contact", id: "contact" },
 ];
 
-export default function Footer() {
+export default function Footer({
+  onAdminClick,
+}: { onAdminClick?: () => void }) {
   const year = new Date().getFullYear();
   const hostname =
     typeof window !== "undefined" ? window.location.hostname : "";
@@ -99,6 +101,16 @@ export default function Footer() {
           >
             Built with ❤️ using caffeine.ai
           </a>
+          {onAdminClick && (
+            <button
+              type="button"
+              onClick={onAdminClick}
+              className="text-xs text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+              title="Admin Login"
+            >
+              Admin
+            </button>
+          )}
         </div>
       </div>
     </footer>

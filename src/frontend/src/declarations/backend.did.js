@@ -141,6 +141,8 @@ export const idlService = IDL.Service({
       [],
     ),
   'toggleFeatured' : IDL.Func([IDL.Nat], [], []),
+  'verifyAdminPassword' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
+  'setAdminPassword' : IDL.Func([IDL.Text], [], []),
   'updatePropertyStatus' : IDL.Func([IDL.Nat, PropertyStatus], [], []),
 });
 
