@@ -8,6 +8,13 @@ const QUICK_LINKS = [
   { label: "Contact", id: "contact" },
 ];
 
+const LEGAL_LINKS = [
+  { label: "About Us", hash: "about-us" },
+  { label: "Contact Us", hash: "contact-us" },
+  { label: "Privacy Policy", hash: "privacy-policy" },
+  { label: "Terms & Conditions", hash: "terms-and-conditions" },
+];
+
 export default function Footer({
   onAdminClick,
 }: { onAdminClick?: () => void }) {
@@ -21,7 +28,7 @@ export default function Footer({
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
           {/* Brand */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
                 <Building2 className="w-5 h-5 text-primary-foreground" />
@@ -64,6 +71,28 @@ export default function Footer({
                         .getElementById(id)
                         ?.scrollIntoView({ behavior: "smooth" })
                     }
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal / Info */}
+          <div>
+            <h4 className="font-display font-semibold text-foreground mb-4">
+              Information
+            </h4>
+            <ul className="space-y-2">
+              {LEGAL_LINKS.map(({ label, hash }) => (
+                <li key={hash}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.hash = hash;
+                    }}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {label}

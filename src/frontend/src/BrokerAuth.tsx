@@ -11,10 +11,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  AlertTriangle,
   ArrowLeft,
   Building2,
   CheckCircle2,
   Clock,
+  Copy,
   Home,
   Lock,
   LogOut,
@@ -35,9 +37,19 @@ interface Broker {
   email: string;
   password: string;
   createdAt: string;
+  subscriptionStatus:
+    | "pending_payment"
+    | "pending_approval"
+    | "active"
+    | "expired"
+    | "deactivated";
+  utr?: string;
+  utrSubmittedAt?: string;
+  approvedAt?: string;
+  expiresAt?: string;
 }
 
-type View = "login" | "signup" | "dashboard";
+type View = "login" | "signup" | "payment" | "pending_approval" | "dashboard";
 
 // ── Storage helpers ───────────────────────────────────────────────────────────
 const BROKERS_KEY = "maha_brokers";
@@ -49,6 +61,11 @@ function getBrokers(): Broker[] {
   } catch {
     return [];
   }
+}
+
+function updateBroker(updated: Broker) {
+  const brokers = getBrokers().map((b) => (b.id === updated.id ? updated : b));
+  localStorage.setItem(BROKERS_KEY, JSON.stringify(brokers));
 }
 
 function saveBroker(broker: Broker) {
@@ -300,10 +317,12 @@ function SignupView({
         email: email.trim().toLowerCase(),
         password,
         createdAt: new Date().toISOString(),
+        subscriptionStatus: "pending_payment",
       };
       saveBroker(broker);
+      setSession(broker);
       setLoading(false);
-      toast.success("Account created! Please sign in.");
+      toast.success("Account created! Please complete payment to activate.");
       onSignup();
     }, 400);
   };
@@ -427,6 +446,259 @@ function SignupView({
   );
 }
 
+// ── Payment View ──────────────────────────────────────────────────────────────
+function PaymentView({
+  broker,
+  isRenewal,
+  onSubmitted,
+  onLogout,
+}: {
+  broker: Broker;
+  isRenewal: boolean;
+  onSubmitted: (updated: Broker) => void;
+  onLogout: () => void;
+}) {
+  const [utr, setUtr] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleCopyUpi = () => {
+    navigator.clipboard.writeText("7447428486@ibl");
+    toast.success("UPI ID copied to clipboard!");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (utr.trim().length < 10) {
+      toast.error("Please enter a valid UTR number (min 10 characters).");
+      return;
+    }
+    setLoading(true);
+    setTimeout(() => {
+      const updated: Broker = {
+        ...broker,
+        utr: utr.trim(),
+        utrSubmittedAt: new Date().toISOString(),
+        subscriptionStatus: "pending_approval",
+      };
+      updateBroker(updated);
+      setSession(updated);
+      setLoading(false);
+      toast.success("Payment submitted! Awaiting admin approval.");
+      onSubmitted(updated);
+    }, 500);
+  };
+
+  return (
+    <motion.div
+      key="payment"
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -16 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="w-full max-w-md mx-auto border-border shadow-card">
+        <CardHeader className="text-center pb-2">
+          <Logo />
+          <CardTitle className="text-xl mt-2">
+            {isRenewal ? "Renew Subscription" : "Activate Broker Subscription"}
+          </CardTitle>
+          <CardDescription>
+            Complete payment to access your broker dashboard
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-5">
+          {/* Deactivated banner */}
+          {broker?.subscriptionStatus === "deactivated" && (
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+              <AlertTriangle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
+              <p className="text-sm text-red-300">
+                Your account has been deactivated by the admin. Please contact
+                us for assistance.
+              </p>
+            </div>
+          )}
+
+          {/* Renewal banner */}
+          {isRenewal && broker?.subscriptionStatus !== "deactivated" && (
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+              <AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+              <p className="text-sm text-amber-300">
+                Your subscription has expired. Please renew to continue
+                accessing your dashboard.
+              </p>
+            </div>
+          )}
+
+          {/* Plan info */}
+          <div className="flex items-center justify-between p-4 rounded-xl bg-primary/10 border border-primary/25">
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Broker Subscription
+              </p>
+              <p className="text-xs text-muted-foreground">
+                6 months — Unlimited listings
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-primary font-display">
+                ₹4,000
+              </p>
+              <p className="text-xs text-muted-foreground">one-time</p>
+            </div>
+          </div>
+
+          {/* QR code */}
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-sm font-medium text-foreground text-center">
+              Scan to Pay via UPI
+            </p>
+            <div className="p-2 rounded-xl bg-white border-2 border-primary/30 shadow-md">
+              <img
+                src="/assets/uploads/AccountQRCodeUnion-Bank-Of-India-3535_DARK_THEME-1.png"
+                alt="UPI QR Code"
+                className="w-48 h-48 object-contain"
+                data-ocid="broker_payment.canvas_target"
+              />
+            </div>
+          </div>
+
+          {/* UPI ID */}
+          <div className="space-y-1.5">
+            <Label className="text-sm">UPI ID</Label>
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-secondary/60 border border-border">
+              <code className="flex-1 text-sm font-mono text-foreground">
+                7447428486@ibl
+              </code>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleCopyUpi}
+                className="text-primary hover:text-primary/80 h-7 px-2"
+                data-ocid="broker_payment.button"
+              >
+                <Copy className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          </div>
+
+          {/* UTR form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="utr-input">
+                UTR / Transaction Reference Number
+              </Label>
+              <Input
+                id="utr-input"
+                placeholder="e.g. 425123456789"
+                value={utr}
+                onChange={(e) => setUtr(e.target.value)}
+                className="font-mono"
+                data-ocid="broker_payment.input"
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter the 12-digit UTR number from your UPI payment
+                confirmation.
+              </p>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+              data-ocid="broker_payment.submit_button"
+            >
+              {loading ? "Submitting..." : "Submit Payment for Approval"}
+            </Button>
+          </form>
+        </CardContent>
+
+        <CardFooter className="pt-0 justify-center">
+          <button
+            type="button"
+            onClick={onLogout}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            data-ocid="broker_payment.button"
+          >
+            <LogOut className="w-3 h-3" /> Logout
+          </button>
+        </CardFooter>
+      </Card>
+    </motion.div>
+  );
+}
+
+// ── Pending Approval View ─────────────────────────────────────────────────────
+function PendingApprovalView({
+  broker,
+  onLogout,
+}: {
+  broker: Broker;
+  onLogout: () => void;
+}) {
+  return (
+    <motion.div
+      key="pending_approval"
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -16 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="w-full max-w-sm mx-auto border-border shadow-card">
+        <CardHeader className="text-center pb-2">
+          <Logo />
+        </CardHeader>
+        <CardContent className="flex flex-col items-center text-center gap-5 pt-2 pb-6">
+          <div className="w-16 h-16 rounded-full bg-green-500/15 border-2 border-green-500/30 flex items-center justify-center">
+            <CheckCircle2 className="w-8 h-8 text-green-400" />
+          </div>
+
+          <div>
+            <h2 className="font-display text-xl font-bold text-foreground mb-1">
+              Payment Submitted!
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Your account is under admin review. You'll be able to access your
+              dashboard once approved.
+            </p>
+          </div>
+
+          <div className="w-full space-y-3">
+            {broker.utr && (
+              <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/60 border border-border text-sm">
+                <span className="text-muted-foreground">Transaction Ref</span>
+                <code className="font-mono text-foreground">{broker.utr}</code>
+              </div>
+            )}
+            <div className="flex items-center justify-between p-3 rounded-lg bg-primary/10 border border-primary/25 text-sm">
+              <span className="text-muted-foreground">Plan</span>
+              <span className="text-primary font-semibold">
+                ₹4,000 / 6 months
+              </span>
+            </div>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            You will receive access once the admin verifies your payment. This
+            usually takes a few hours.
+          </p>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onLogout}
+            className="gap-1.5"
+            data-ocid="broker_pending.button"
+          >
+            <LogOut className="w-3.5 h-3.5" /> Logout
+          </Button>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
 // ── Dashboard View ────────────────────────────────────────────────────────────
 function DashboardView({
   broker,
@@ -440,6 +712,14 @@ function DashboardView({
     month: "long",
     year: "numeric",
   });
+
+  const expiryLabel = broker.expiresAt
+    ? `Expires: ${new Date(broker.expiresAt).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })}`
+    : "Active";
 
   return (
     <motion.div
@@ -528,8 +808,8 @@ function DashboardView({
         <StatCard
           icon={Clock}
           label="Subscription"
-          value="Pending"
-          sub="Payment required"
+          value="Active"
+          sub={expiryLabel}
         />
         <StatCard
           icon={CheckCircle2}
@@ -538,32 +818,6 @@ function DashboardView({
           sub={joined.split(" ").slice(0, 2).join(" ")}
         />
       </div>
-
-      {/* CTA */}
-      <Card className="border-primary/30 bg-primary/5 shadow-card">
-        <CardContent className="pt-4 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-              <Building2 className="w-5 h-5 text-primary" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold">
-                Activate Your Subscription
-              </p>
-              <p className="text-xs text-muted-foreground">
-                ₹4,000 for 6 months — List unlimited properties
-              </p>
-            </div>
-          </div>
-          <Button
-            className="w-full mt-3"
-            size="sm"
-            data-ocid="broker_dashboard.primary_button"
-          >
-            Pay & Activate — ₹4,000
-          </Button>
-        </CardContent>
-      </Card>
 
       <p className="text-center text-xs text-muted-foreground mt-6">
         © {new Date().getFullYear()}.{" "}
@@ -583,21 +837,90 @@ function DashboardView({
 // ── Main BrokerAuth ───────────────────────────────────────────────────────────
 export default function BrokerAuth({ onBack }: { onBack: () => void }) {
   const existingSession = getSession();
-  const [view, setView] = useState<View>(
-    existingSession ? "dashboard" : "login",
-  );
-  const [broker, setBroker] = useState<Broker | null>(existingSession);
+
+  // Determine initial view based on session
+  function getInitialState(): {
+    view: View;
+    broker: Broker | null;
+    isRenewal: boolean;
+  } {
+    if (!existingSession)
+      return { view: "login", broker: null, isRenewal: false };
+    const b = existingSession;
+    if (b.subscriptionStatus === "active") {
+      if (b.expiresAt && new Date(b.expiresAt) > new Date()) {
+        return { view: "dashboard", broker: b, isRenewal: false };
+      }
+      // Expired — update storage
+      const expired: Broker = { ...b, subscriptionStatus: "expired" };
+      updateBroker(expired);
+      setSession(expired);
+      return { view: "payment", broker: expired, isRenewal: true };
+    }
+    if (b.subscriptionStatus === "pending_approval") {
+      return { view: "pending_approval", broker: b, isRenewal: false };
+    }
+    if (b.subscriptionStatus === "deactivated") {
+      return { view: "payment", broker: b, isRenewal: false };
+    }
+    // pending_payment or expired
+    return {
+      view: "payment",
+      broker: b,
+      isRenewal: b.subscriptionStatus === "expired",
+    };
+  }
+
+  const initial = getInitialState();
+  const [view, setView] = useState<View>(initial.view);
+  const [broker, setBroker] = useState<Broker | null>(initial.broker);
+  const [isRenewal, setIsRenewal] = useState(initial.isRenewal);
 
   const handleLogin = (b: Broker) => {
     setBroker(b);
-    setView("dashboard");
+    if (b.subscriptionStatus === "active") {
+      if (b.expiresAt && new Date(b.expiresAt) > new Date()) {
+        setIsRenewal(false);
+        setView("dashboard");
+      } else {
+        const expired: Broker = { ...b, subscriptionStatus: "expired" };
+        updateBroker(expired);
+        setSession(expired);
+        setBroker(expired);
+        setIsRenewal(true);
+        setView("payment");
+      }
+    } else if (b.subscriptionStatus === "deactivated") {
+      toast.error("Your account has been deactivated. Contact admin.");
+      setView("payment");
+    } else if (b.subscriptionStatus === "pending_approval") {
+      setView("pending_approval");
+    } else {
+      setIsRenewal(b.subscriptionStatus === "expired");
+      setView("payment");
+    }
+  };
+
+  const handleSignup = () => {
+    const session = getSession();
+    if (session) {
+      setBroker(session);
+      setIsRenewal(false);
+      setView("payment");
+    }
   };
 
   const handleLogout = () => {
     clearBrokerSession();
     setBroker(null);
+    setIsRenewal(false);
     setView("login");
     toast.success("Logged out successfully.");
+  };
+
+  const handlePaymentSubmitted = (updated: Broker) => {
+    setBroker(updated);
+    setView("pending_approval");
   };
 
   return (
@@ -616,9 +939,25 @@ export default function BrokerAuth({ onBack }: { onBack: () => void }) {
             {view === "signup" && (
               <SignupView
                 key="signup"
-                onSignup={() => setView("login")}
+                onSignup={handleSignup}
                 onGoLogin={() => setView("login")}
                 onBack={onBack}
+              />
+            )}
+            {view === "payment" && broker && (
+              <PaymentView
+                key="payment"
+                broker={broker}
+                isRenewal={isRenewal}
+                onSubmitted={handlePaymentSubmitted}
+                onLogout={handleLogout}
+              />
+            )}
+            {view === "pending_approval" && broker && (
+              <PendingApprovalView
+                key="pending_approval"
+                broker={broker}
+                onLogout={handleLogout}
               />
             )}
             {view === "dashboard" && broker && (

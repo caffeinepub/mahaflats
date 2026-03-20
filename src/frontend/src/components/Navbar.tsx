@@ -1,5 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Building2, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import {
+  Building2,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Newspaper,
+  UserPlus,
+  X,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
@@ -21,6 +29,16 @@ export default function Navbar({
   const scrollTo = (id: string) => {
     setMobileOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const goToBroker = () => {
+    setMobileOpen(false);
+    window.location.hash = "broker";
+  };
+
+  const goToBlog = () => {
+    setMobileOpen(false);
+    window.location.hash = "blog";
   };
 
   return (
@@ -63,19 +81,29 @@ export default function Navbar({
           </button>
           <button
             type="button"
-            data-ocid="nav.list_property_link"
-            onClick={() => scrollTo("list-property")}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            data-ocid="nav.blog_link"
+            onClick={goToBlog}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
           >
-            List Property
+            <Newspaper className="w-3.5 h-3.5" />
+            Blog
           </button>
           <button
             type="button"
+            data-ocid="nav.contact_link"
             onClick={() => scrollTo("contact")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             Contact
           </button>
+          <Button
+            size="sm"
+            onClick={goToBroker}
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            <UserPlus className="w-4 h-4 mr-1" />
+            Broker Signup
+          </Button>
         </nav>
 
         {/* Admin controls (only visible when admin is logged in) */}
@@ -150,10 +178,12 @@ export default function Navbar({
               </button>
               <button
                 type="button"
-                onClick={() => scrollTo("list-property")}
-                className="text-left text-sm text-muted-foreground hover:text-foreground"
+                data-ocid="nav.blog_mobile_link"
+                onClick={goToBlog}
+                className="text-left text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
               >
-                List Property
+                <Newspaper className="w-4 h-4" />
+                Blog
               </button>
               <button
                 type="button"
@@ -162,6 +192,14 @@ export default function Navbar({
               >
                 Contact
               </button>
+              <Button
+                size="sm"
+                onClick={goToBroker}
+                className="w-full bg-primary text-primary-foreground"
+              >
+                <UserPlus className="w-4 h-4 mr-1" />
+                Broker Signup
+              </Button>
               {isAdminSession && (
                 <>
                   <Button

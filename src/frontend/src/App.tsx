@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 import BrokerAuth from "./BrokerAuth";
 import AboutSection from "./components/AboutSection";
+import AboutUsPage from "./components/AboutUsPage";
 import AccessDenied from "./components/AccessDenied";
 import AdminDashboard from "./components/AdminDashboard";
 import AdminLogin, {
@@ -9,13 +10,17 @@ import AdminLogin, {
   getAdminSession,
 } from "./components/AdminLogin";
 import AllListings from "./components/AllListings";
+import BlogPage from "./components/BlogPage";
 import ContactSection from "./components/ContactSection";
+import ContactUsPage from "./components/ContactUsPage";
 import FAQSection from "./components/FAQSection";
 import FeaturedProperties from "./components/FeaturedProperties";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
+import PrivacyPolicyPage from "./components/PrivacyPolicyPage";
 import SellerForm from "./components/SellerForm";
+import TermsAndConditionsPage from "./components/TermsAndConditionsPage";
 import TrustSection from "./components/TrustSection";
 import WhatsAppButton from "./components/WhatsAppButton";
 
@@ -24,7 +29,12 @@ type View =
   | "admin-login"
   | "admin-dashboard"
   | "access-denied"
-  | "broker";
+  | "broker"
+  | "blog"
+  | "about-us"
+  | "contact-us"
+  | "privacy-policy"
+  | "terms-and-conditions";
 
 const ADMIN_SECRET_HASH = "#admin-maha-secure";
 
@@ -42,6 +52,11 @@ function resolveHashView(hash: string): View | null {
   ) {
     return "broker";
   }
+  if (hash === "#blog") return "blog";
+  if (hash === "#about-us") return "about-us";
+  if (hash === "#contact-us") return "contact-us";
+  if (hash === "#privacy-policy") return "privacy-policy";
+  if (hash === "#terms-and-conditions") return "terms-and-conditions";
   return null;
 }
 
@@ -88,7 +103,51 @@ export default function App() {
     setView("public");
   };
 
-  // ── Broker view ──────────────────────────────────────────────────────────
+  if (view === "blog") {
+    return (
+      <>
+        <BlogPage onBack={handleBackToPublic} />
+        <Toaster richColors position="top-right" />
+      </>
+    );
+  }
+
+  if (view === "about-us") {
+    return (
+      <>
+        <AboutUsPage onBack={handleBackToPublic} />
+        <Toaster richColors position="top-right" />
+      </>
+    );
+  }
+
+  if (view === "contact-us") {
+    return (
+      <>
+        <ContactUsPage onBack={handleBackToPublic} />
+        <Toaster richColors position="top-right" />
+      </>
+    );
+  }
+
+  if (view === "privacy-policy") {
+    return (
+      <>
+        <PrivacyPolicyPage onBack={handleBackToPublic} />
+        <Toaster richColors position="top-right" />
+      </>
+    );
+  }
+
+  if (view === "terms-and-conditions") {
+    return (
+      <>
+        <TermsAndConditionsPage onBack={handleBackToPublic} />
+        <Toaster richColors position="top-right" />
+      </>
+    );
+  }
+
   if (view === "broker") {
     return (
       <>
@@ -98,7 +157,6 @@ export default function App() {
     );
   }
 
-  // ── Admin login view ─────────────────────────────────────────────────────
   if (view === "admin-login") {
     return (
       <>
