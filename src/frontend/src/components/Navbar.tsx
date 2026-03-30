@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import {
   Building2,
+  CalendarCheck,
+  Home,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -41,6 +43,16 @@ export default function Navbar({
     window.location.hash = "blog";
   };
 
+  const goToOwnerListing = () => {
+    setMobileOpen(false);
+    window.location.hash = "owner-listing";
+  };
+
+  const goToBuyerVisit = () => {
+    setMobileOpen(false);
+    window.location.hash = "buyer-visit";
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 nav-glass">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -62,7 +74,7 @@ export default function Navbar({
         </button>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-5">
           <button
             type="button"
             data-ocid="nav.home_link"
@@ -95,6 +107,24 @@ export default function Navbar({
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             Contact
+          </button>
+          <button
+            type="button"
+            data-ocid="nav.list_property_link"
+            onClick={goToOwnerListing}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+          >
+            <Home className="w-3.5 h-3.5" />
+            List Property
+          </button>
+          <button
+            type="button"
+            data-ocid="nav.request_visit_link"
+            onClick={goToBuyerVisit}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+          >
+            <CalendarCheck className="w-3.5 h-3.5" />
+            Request Visit
           </button>
           <Button
             size="sm"
@@ -191,6 +221,24 @@ export default function Navbar({
                 className="text-left text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
+              </button>
+              <button
+                type="button"
+                data-ocid="nav.list_property_mobile_link"
+                onClick={goToOwnerListing}
+                className="text-left text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
+              >
+                <Home className="w-4 h-4" />
+                List Property
+              </button>
+              <button
+                type="button"
+                data-ocid="nav.request_visit_mobile_link"
+                onClick={goToBuyerVisit}
+                className="text-left text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
+              >
+                <CalendarCheck className="w-4 h-4" />
+                Request Visit
               </button>
               <Button
                 size="sm"

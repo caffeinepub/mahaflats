@@ -11,6 +11,7 @@ import AdminLogin, {
 } from "./components/AdminLogin";
 import AllListings from "./components/AllListings";
 import BlogPage from "./components/BlogPage";
+import BuyerVisitForm from "./components/BuyerVisitForm";
 import ContactSection from "./components/ContactSection";
 import ContactUsPage from "./components/ContactUsPage";
 import FAQSection from "./components/FAQSection";
@@ -18,6 +19,7 @@ import FeaturedProperties from "./components/FeaturedProperties";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
+import OwnerListingForm from "./components/OwnerListingForm";
 import PrivacyPolicyPage from "./components/PrivacyPolicyPage";
 import SellerForm from "./components/SellerForm";
 import TermsAndConditionsPage from "./components/TermsAndConditionsPage";
@@ -34,7 +36,9 @@ type View =
   | "about-us"
   | "contact-us"
   | "privacy-policy"
-  | "terms-and-conditions";
+  | "terms-and-conditions"
+  | "owner-listing"
+  | "buyer-visit";
 
 const ADMIN_SECRET_HASH = "#admin-maha-secure";
 
@@ -57,6 +61,8 @@ function resolveHashView(hash: string): View | null {
   if (hash === "#contact-us") return "contact-us";
   if (hash === "#privacy-policy") return "privacy-policy";
   if (hash === "#terms-and-conditions") return "terms-and-conditions";
+  if (hash === "#owner-listing") return "owner-listing";
+  if (hash === "#buyer-visit") return "buyer-visit";
   return null;
 }
 
@@ -143,6 +149,24 @@ export default function App() {
     return (
       <>
         <TermsAndConditionsPage onBack={handleBackToPublic} />
+        <Toaster richColors position="top-right" />
+      </>
+    );
+  }
+
+  if (view === "owner-listing") {
+    return (
+      <>
+        <OwnerListingForm onBack={handleBackToPublic} />
+        <Toaster richColors position="top-right" />
+      </>
+    );
+  }
+
+  if (view === "buyer-visit") {
+    return (
+      <>
+        <BuyerVisitForm onBack={handleBackToPublic} />
         <Toaster richColors position="top-right" />
       </>
     );

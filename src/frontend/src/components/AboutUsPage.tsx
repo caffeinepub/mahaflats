@@ -82,16 +82,21 @@ export default function AboutUsPage({ onBack }: { onBack: () => void }) {
               Who We Are
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Mahaflats.com is a professionally managed real estate platform
-              built specifically for the Maharashtra property market. We provide
-              a fast, secure, and transparent way to search, list, and discover
-              residential flats across the state's key cities.
+              Mahaflats.com is a growing digital platform dedicated to helping
+              users find reliable property-related information and services in a
+              simple and transparent way. Our mission is to make property
+              discovery easier, faster, and more accessible for everyone.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              We focus on connecting users with genuine property opportunities,
+              useful listings, and location-based insights to support smarter
+              decisions. At Mahaflats.com, we believe in building trust through
+              clarity, simplicity, and user-friendly experiences.
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              Founded with a mission to simplify property discovery for
-              Maharashtra residents, we bridge the gap between property seekers
-              and genuine sellers — without the noise, spam, or hidden charges
-              that plague other portals.
+              Our platform is continuously improving to provide better services,
+              accurate information, and a smooth browsing experience for all
+              visitors.
             </p>
           </div>
         </section>
@@ -102,9 +107,9 @@ export default function AboutUsPage({ onBack }: { onBack: () => void }) {
               Our Mission
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              To make property buying, selling, and renting in Maharashtra
-              simple, safe, and affordable — with zero hidden costs for buyers
-              and a clear, fair process for sellers and brokers.
+              To make property discovery easier, faster, and more accessible for
+              everyone — with a clear, fair, and transparent process for buyers,
+              sellers, and brokers across Maharashtra.
             </p>
           </div>
         </section>
@@ -197,6 +202,26 @@ export default function AboutUsPage({ onBack }: { onBack: () => void }) {
               <MessageCircle className="w-5 h-5" />
               Contact Us on WhatsApp
             </a>
+          </div>
+        </section>
+
+        <section className="border-t border-border py-10">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="font-display font-bold text-xl text-foreground mb-4">
+              Ownership
+            </h2>
+            <div className="space-y-2 text-muted-foreground">
+              <p>
+                <span className="font-semibold text-foreground">Owned by:</span>{" "}
+                Arman Hamju Mulani
+              </p>
+              <p>
+                <span className="font-semibold text-foreground">
+                  Powered by:
+                </span>{" "}
+                Mahaflats.com
+              </p>
+            </div>
           </div>
         </section>
       </main>

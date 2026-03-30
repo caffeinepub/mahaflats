@@ -350,12 +350,121 @@ const blogPosts: BlogPost[] = [
 <p>Mumbai remains the most popular destination for NRI property investment in Maharashtra, driven by strong emotional connections, premium property market performance, and robust rental returns. Pune has emerged as a close second, attracting IT sector NRIs with its tech-focused economy and relatively affordable prices. Nagpur is gaining traction among Vidarbha diaspora NRIs who see significant value creation potential in the city's MIHAN-led growth story. Regardless of which Maharashtra city you choose, always verify that the property or project is registered with MahaRERA before making any payment. MahaRERA registration provides legal protection, ensures construction timeline accountability, and gives buyers recourse in case of disputes. Visit maharera.mahaonline.gov.in to verify any project's registration status. Browse Mahaflats' verified listings across Maharashtra's major cities to begin your NRI property investment journey with confidence.</p>
     `,
   },
+
+  {
+    id: 11,
+    title: "How to Verify Property Documents in Maharashtra: A Complete Guide",
+    description:
+      "Buying a property in Maharashtra? Learn how to verify all essential property documents step by step, understand RERA registration, and protect yourself from fraud with this expert guide by MahaFlats.",
+    image: "/assets/generated/blog-property-documents.dim_800x500.jpg",
+    category: "Legal Guide",
+    date: "March 21, 2026",
+    readTime: "9 min read",
+    content: `
+<h1>How to Verify Property Documents in Maharashtra: A Complete Guide</h1>
+
+<p>Purchasing a property is one of the most significant financial decisions of your life. In Maharashtra, ensuring all property documents are legally valid and free from encumbrances is absolutely essential before you sign any agreement or make any payment. Document fraud, disputed titles, and incomplete permissions are among the most common risks buyers face. At MahaFlats, we believe every buyer deserves to make an informed decision. This step-by-step guide walks you through the complete process of verifying property documents in Maharashtra.</p>
+
+<h2>Why Document Verification Matters</h2>
+<p>Skipping document verification can lead to serious legal and financial consequences. Properties with disputed ownership, pending litigation, or unapproved construction can result in your investment being frozen or lost entirely. Maharashtra's legal framework provides strong protections for buyers, but only those who exercise due diligence can take full advantage of those protections. The verification process may feel time-consuming, but it is your strongest defence against fraud and future disputes.</p>
+
+<h2>Step 1: Verify the Title Deed</h2>
+<ul>
+  <li>The title deed establishes legal ownership of the property. Ask the seller for the original and review it carefully.</li>
+  <li>Trace the chain of ownership going back at least 30 years to identify any gaps, disputes, or irregularities in transfer history.</li>
+  <li>Verify that the seller's name on the title deed matches their government-issued identity proof.</li>
+  <li>Confirm that the title is clear — meaning no third party has a legal claim on the property.</li>
+  <li>If the property was inherited, check for a valid Will or succession certificate in addition to the title deed.</li>
+</ul>
+
+<h2>Step 2: Check the Encumbrance Certificate</h2>
+<ul>
+  <li>An Encumbrance Certificate confirms the property is free from any financial or legal liabilities such as mortgages, loans, or court orders.</li>
+  <li>Obtain the EC from the Sub-Registrar's Office or through igrmaharashtra.gov.in for the last 15 to 30 years.</li>
+  <li>If the EC shows an outstanding home loan, ensure the seller provides a bank clearance letter and NOC confirming the loan has been fully repaid before you proceed.</li>
+</ul>
+
+<h2>Step 3: Verify Property Tax Receipts</h2>
+<ul>
+  <li>Obtain copies of the latest property tax receipts to confirm the property is registered with the local municipal body such as BMC, PMC, or TMC.</li>
+  <li>Verify there are no outstanding property tax dues — these liabilities automatically transfer to the new owner after purchase.</li>
+  <li>Property tax status for major Maharashtra cities can be verified online through the respective municipal corporation portal.</li>
+</ul>
+
+<h2>Step 4: Check the Building Plan and Occupancy Certificate</h2>
+<ul>
+  <li>The Approved Building Plan confirms the structure was built per drawings sanctioned by the local authority.</li>
+  <li>Ask for the Commencement Certificate, which shows construction was legally permitted to begin.</li>
+  <li>For completed buildings, insist on the Occupancy Certificate issued by the local authority. The OC confirms the building is fit for occupation and legally habitable.</li>
+  <li>Purchasing a property without a valid OC can create serious problems with utility connections, home loans, and future resale.</li>
+</ul>
+
+<h2>Step 5: Check the Society NOC and Share Certificate</h2>
+<ul>
+  <li>If you are buying a flat in a housing society, obtain a No Objection Certificate from the Cooperative Housing Society.</li>
+  <li>Ask for the Share Certificate, which confirms the seller's membership in the society and must be transferred to your name after purchase.</li>
+  <li>Confirm with the society that there are no pending maintenance dues, special levies, or ongoing disputes related to the flat.</li>
+  <li>Verify the society's registration with the office of the Registrar of Cooperative Societies in Maharashtra.</li>
+</ul>
+
+<h2>Step 6: Verify the 7/12 Extract for Plots and Land</h2>
+<ul>
+  <li>For plot or land purchases, verify the 7/12 extract (Satbara Utara) showing ownership details and land use classification, available at mahabhulekh.maharashtra.gov.in.</li>
+  <li>Ensure the land is classified as residential or non-agricultural (NA) if you intend to construct a house. Agricultural land cannot be used for residential construction without proper NA conversion.</li>
+  <li>Also check the 8A extract for tax liability and the Property Card in urban areas to confirm all records are consistent.</li>
+</ul>
+
+<h2>RERA Registration: Why It Is Critical for Buyers</h2>
+<p>The Real Estate (Regulation and Development) Act, 2016 — commonly known as RERA — is one of the most important consumer protection laws for property buyers in India. In Maharashtra, it is implemented through MahaRERA (Maharashtra Real Estate Regulatory Authority), accessible at maharera.mahaonline.gov.in. All residential and commercial projects above a specified size must be registered with MahaRERA before being marketed or sold to buyers.</p>
+
+<h3>How MahaRERA Protects Buyers</h3>
+<ul>
+  <li><strong>Legal accountability:</strong> Developers registered with MahaRERA are legally bound to deliver the property as promised in the agreement. Non-compliance attracts strict penalties under the Act.</li>
+  <li><strong>Full transparency:</strong> All project details including layout plans, government approvals, completion timelines, and financial disclosures are publicly available on the MahaRERA portal. Any buyer can review them before making a decision.</li>
+  <li><strong>Timely possession guarantee:</strong> Developers must publicly declare a possession date. Delays without valid reasons entitle buyers to compensation at the prescribed interest rate under RERA rules.</li>
+  <li><strong>Escrow fund protection:</strong> Developers are legally required to deposit 70% of collected buyer funds in a dedicated escrow account. This prevents developers from diverting your money to other projects or personal use.</li>
+  <li><strong>Fast grievance redressal:</strong> Buyers can file complaints directly with MahaRERA and typically receive a binding resolution within 60 days — far faster and less expensive than civil court proceedings.</li>
+  <li><strong>Broker accountability:</strong> Real estate agents and brokers must also be individually registered with MahaRERA. Always ask for your broker's MahaRERA registration number before engaging their services.</li>
+</ul>
+
+<h3>How to Verify MahaRERA Registration</h3>
+<ul>
+  <li>Visit maharera.mahaonline.gov.in and click on "Registered Projects".</li>
+  <li>Search by project name, developer name, or MahaRERA registration number to access full project details.</li>
+  <li>Verify that the project name, developer name, and registration number on MahaRERA match exactly what is mentioned in the sale agreement you are signing.</li>
+  <li>Review the project's declared completion date, number of approved units, approved FSI, and any registered complaints or violations.</li>
+  <li>Never make any payment to a developer for a project that is legally required to be MahaRERA-registered but is not. This is a serious red flag.</li>
+</ul>
+
+<h2>Step 7: Consult a Property Lawyer</h2>
+<ul>
+  <li>Before finalising any purchase, engage a qualified property lawyer experienced in Maharashtra real estate law to conduct a full title search and legal due diligence.</li>
+  <li>The lawyer should draft or review the Agreement to Sale, ensuring all your rights and the developer's or seller's obligations are clearly documented.</li>
+  <li>Ensure the sale deed is properly executed, stamped per Maharashtra stamp duty rates, and registered at the Sub-Registrar's Office. An unregistered sale deed has no legal validity in a court of law.</li>
+</ul>
+
+<h2>Complete Verification Checklist</h2>
+<ul>
+  <li>Title deed with clear chain of ownership (minimum 30 years)</li>
+  <li>Encumbrance Certificate (last 15 to 30 years, no pending loans or court orders)</li>
+  <li>Property tax receipts with no outstanding dues</li>
+  <li>Approved building plan and valid Occupancy Certificate</li>
+  <li>Society NOC and Share Certificate (for apartments in cooperative societies)</li>
+  <li>7/12 extract with correct NA classification (for plots and land)</li>
+  <li>MahaRERA registration verified and project details confirmed (for new projects)</li>
+  <li>Legal opinion from a qualified and experienced property lawyer</li>
+</ul>
+
+<p>At MahaFlats, all listed properties go through initial documentation checks before being published on our platform. Browse our verified listings across Mumbai, Pune, Thane, Nagpur, Nashik, Navi Mumbai, and Aurangabad with confidence. For additional guidance at any step of the verification process, reach our expert team through the MahaFlats Contact page — we are here to support every stage of your property buying journey in Maharashtra.</p>
+    `,
+  },
 ];
 
 const categoryColors: Record<string, string> = {
   "Market Trends": "bg-blue-500/20 text-blue-300 border-blue-500/30",
   "Buying Guide": "bg-green-500/20 text-green-300 border-green-500/30",
   Investment: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+  "Legal Guide": "bg-purple-500/20 text-purple-300 border-purple-500/30",
 };
 
 interface BlogPageProps {

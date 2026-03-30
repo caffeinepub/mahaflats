@@ -1,31 +1,29 @@
-# Mahaflats — AdSense Readiness Upgrade
+# Mahaflats – Property Listing Workflow
 
 ## Current State
-- Blog section exists with 5 articles (Mumbai, Pune, Thane, buying guide, investment tips)
-- Navigation: Home, Listings, Blog, Contact, Broker Signup
-- Legal pages: About Us, Contact Us, Privacy Policy
-- Footer has Information section with 3 links (missing Terms and Conditions)
-- No Terms and Conditions page exists
-- App.tsx routing does not include terms-and-conditions view
+The site has a public homepage with listings, seller form, blog, broker auth, admin dashboard, and legal pages. Navigation uses hash-based routing. Existing views include: public, blog, about-us, contact-us, privacy-policy, terms-and-conditions, broker, admin-login, admin-dashboard, access-denied.
 
 ## Requested Changes (Diff)
 
 ### Add
-- 5 more blog articles (10 total) focused on Maharashtra cities: Nagpur, Nashik, Navi Mumbai, home loan guide, and NRI investment guide — each 700+ words with proper H1/H2 structure
-- Terms and Conditions page component (TermsAndConditionsPage.tsx)
-- Route `#terms-and-conditions` in App.tsx
-- Terms and Conditions link in Footer's Information section
+- **OwnerListingForm** component (`#owner-listing` route): A full property listing form for owners with fields: Owner Full Name, Mobile Number, Property Type (dropdown: Flat/Plot/House/Commercial), Property Location, Expected Price, Upload Property Photos (multi-file), Property Description (textarea). Mandatory agreement checkbox with exact text provided. Submit blocked unless checkbox checked. On submit, show success confirmation.
+- **BuyerVisitForm** component (`#buyer-visit` route): Visit request form with fields: Buyer Full Name, Mobile Number, Property ID or Property Name, Preferred Visit Date (date picker). Mandatory agreement checkbox with exact text provided. Submit blocked unless checkbox checked. On submit, show exact confirmation message provided.
+- **PrintableVisitConfirmation** component: Shown after buyer form submission. Displays: heading "Mahaflats Property Site Visit Confirmation Agreement", Buyer Name, Owner Name (manual input or placeholder), Property Details, Visit Date, three signature blocks (Buyer, Owner, Mahaflats Representative). Must be printable on A4 — use print-specific CSS (`@media print`) to hide non-printable elements and format as A4. Include a "Print" button that triggers `window.print()`.
+- Two new nav links in Navbar: "List Property" (links to `#owner-listing`) and "Request Visit" (links to `#buyer-visit`) — add to both desktop and mobile menus.
+- Two new view types in App.tsx: `owner-listing` and `buyer-visit`.
+- Hash routing for `#owner-listing` and `#buyer-visit` in `resolveHashView`.
 
 ### Modify
-- BlogPage.tsx: append 5 new articles to the blogPosts array; ensure all articles have 700+ words with SEO-friendly content about Maharashtra cities
-- Footer.tsx: add Terms and Conditions to LEGAL_LINKS array
-- App.tsx: add `terms-and-conditions` to View type, resolve hash, and render TermsAndConditionsPage
+- **App.tsx**: Add `owner-listing` and `buyer-visit` to View type, resolveHashView, and render logic.
+- **Navbar.tsx**: Add "List Property" and "Request Visit" nav items.
 
 ### Remove
-- Any empty placeholder sections or broken elements across public pages
+Nothing removed.
 
 ## Implementation Plan
-1. Create TermsAndConditionsPage.tsx with full legal content relevant to a real estate marketplace
-2. Update BlogPage.tsx with 5 new 700+ word articles on: Nagpur real estate, Nashik investment, Navi Mumbai guide, home loan tips for Maharashtra, NRI property buying guide
-3. Update Footer.tsx to add Terms and Conditions link
-4. Update App.tsx to add the new view type, hash resolver, and render block
+1. Create `src/frontend/src/components/OwnerListingForm.tsx` — full form with all fields, agreement checkbox, photo upload (local preview only, no backend upload), and success state.
+2. Create `src/frontend/src/components/BuyerVisitForm.tsx` — form with all fields, agreement checkbox, success confirmation message, then show printable confirmation.
+3. Create `src/frontend/src/components/PrintableVisitConfirmation.tsx` — A4 printable agreement page with all required fields and signature spaces, Print button.
+4. Update `App.tsx` to add new views and routes.
+5. Update `Navbar.tsx` to add new nav links.
+6. Add print CSS in index.css or inline styles for A4 print layout.
