@@ -21,7 +21,6 @@ import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
 import OwnerListingForm from "./components/OwnerListingForm";
 import PrivacyPolicyPage from "./components/PrivacyPolicyPage";
-import SellerForm from "./components/SellerForm";
 import TermsAndConditionsPage from "./components/TermsAndConditionsPage";
 import TrustSection from "./components/TrustSection";
 import WhatsAppButton from "./components/WhatsAppButton";
@@ -224,8 +223,6 @@ export default function App() {
           </section>
 
           <AllListings cityFilter={cityFilter} />
-
-          <SellerForm />
 
           <section id="about">
             <AboutSection />
