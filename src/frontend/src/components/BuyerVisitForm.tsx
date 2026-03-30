@@ -106,9 +106,8 @@ export default function BuyerVisitForm({ onBack }: Props) {
             <div className="bg-card/60 border border-border rounded-lg p-5 max-w-md mx-auto text-left mb-6">
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Your property visit request has been recorded through Mahaflats.
-                This visit is officially treated as a platform-arranged
-                introduction. A 1% service charge will be applicable on
-                successful transaction completion.
+                Our team will coordinate with the property owner and get back to
+                you shortly.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -266,10 +265,8 @@ export default function BuyerVisitForm({ onBack }: Props) {
                     className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
                   >
                     I confirm that I am requesting a property visit through
-                    Mahaflats platform. I agree that if I finalize this property
-                    after introduction through Mahaflats, a 1% platform service
-                    charge will be applicable on the final transaction value. I
-                    agree not to bypass Mahaflats after site visit introduction.
+                    Mahaflats platform. I understand that Mahaflats is acting as
+                    a property introduction platform between buyer and owner.
                   </Label>
                 </div>
               </div>
