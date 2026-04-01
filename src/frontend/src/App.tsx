@@ -18,8 +18,8 @@ import FAQSection from "./components/FAQSection";
 import FeaturedProperties from "./components/FeaturedProperties";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
+import ListingTypePage from "./components/ListingTypePage";
 import Navbar from "./components/Navbar";
-import OwnerListingForm from "./components/OwnerListingForm";
 import PrivacyPolicyPage from "./components/PrivacyPolicyPage";
 import TermsAndConditionsPage from "./components/TermsAndConditionsPage";
 import TrustSection from "./components/TrustSection";
@@ -156,7 +156,7 @@ export default function App() {
   if (view === "owner-listing") {
     return (
       <>
-        <OwnerListingForm onBack={handleBackToPublic} />
+        <ListingTypePage onBack={handleBackToPublic} />
         <Toaster richColors position="top-right" />
       </>
     );
