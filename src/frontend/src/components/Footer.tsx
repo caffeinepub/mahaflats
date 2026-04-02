@@ -1,18 +1,20 @@
 import { Building2, MapPin, MessageCircle } from "lucide-react";
 
-const QUICK_LINKS = [
-  { label: "Home", id: "hero" },
-  { label: "All Listings", id: "listings" },
-  { label: "List Property", id: "list-property" },
-  { label: "About Us", id: "about" },
-  { label: "Contact", id: "contact" },
-];
-
 const LEGAL_LINKS = [
   { label: "About Us", hash: "about-us" },
   { label: "Contact Us", hash: "contact-us" },
   { label: "Privacy Policy", hash: "privacy-policy" },
   { label: "Terms & Conditions", hash: "terms-and-conditions" },
+];
+
+const CITIES = [
+  "Mumbai",
+  "Pune",
+  "Thane",
+  "Nagpur",
+  "Nashik",
+  "Navi Mumbai",
+  "Aurangabad",
 ];
 
 export default function Footer({
@@ -43,7 +45,7 @@ export default function Footer({
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
               Maharashtra's trusted real estate marketplace. Connecting genuine
               buyers and verified sellers across Mumbai, Pune, Thane, Nagpur,
-              and Nashik.
+              Nashik, Navi Mumbai and Aurangabad.
             </p>
             <a
               href="https://wa.me/917447428486"
@@ -62,15 +64,49 @@ export default function Footer({
               Quick Links
             </h4>
             <ul className="space-y-2">
-              {QUICK_LINKS.map(({ label, id }) => (
-                <li key={id}>
+              {[
+                {
+                  label: "Home",
+                  action: () => {
+                    window.location.hash = "";
+                  },
+                },
+                {
+                  label: "All Listings",
+                  action: () => {
+                    window.location.hash = "";
+                    setTimeout(
+                      () =>
+                        document
+                          .getElementById("listings")
+                          ?.scrollIntoView({ behavior: "smooth" }),
+                      100,
+                    );
+                  },
+                },
+                {
+                  label: "Blog",
+                  action: () => {
+                    window.location.hash = "blog";
+                  },
+                },
+                {
+                  label: "List Property",
+                  action: () => {
+                    window.location.hash = "list-property";
+                  },
+                },
+                {
+                  label: "Request Visit",
+                  action: () => {
+                    window.location.hash = "buyer-visit";
+                  },
+                },
+              ].map(({ label, action }) => (
+                <li key={label}>
                   <button
                     type="button"
-                    onClick={() =>
-                      document
-                        .getElementById(id)
-                        ?.scrollIntoView({ behavior: "smooth" })
-                    }
+                    onClick={action}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {label}
@@ -108,7 +144,7 @@ export default function Footer({
               Cities We Serve
             </h4>
             <ul className="space-y-2">
-              {["Mumbai", "Pune", "Thane", "Nagpur", "Nashik"].map((city) => (
+              {CITIES.map((city) => (
                 <li key={city} className="flex items-center gap-2">
                   <MapPin className="w-3.5 h-3.5 text-primary" />
                   <span className="text-sm text-muted-foreground">{city}</span>

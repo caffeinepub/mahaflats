@@ -10,7 +10,16 @@ import { MapPin, PlusCircle, Search, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 
-const CITIES = ["All Cities", "Mumbai", "Pune", "Thane", "Nagpur", "Nashik"];
+const CITIES = [
+  "All Cities",
+  "Mumbai",
+  "Pune",
+  "Thane",
+  "Nagpur",
+  "Nashik",
+  "Navi Mumbai",
+  "Aurangabad",
+];
 
 interface HeroProps {
   onCityFilter: (city: string) => void;
@@ -64,9 +73,9 @@ export default function Hero({ onCityFilter }: HeroProps) {
           </h1>
 
           <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10">
-            Browse thousands of verified properties across Mumbai, Pune, Thane,
-            Nagpur, and Nashik. Direct listings from verified sellers at the
-            best prices.
+            Browse verified properties across Mumbai, Pune, Thane, Nagpur,
+            Nashik, Navi Mumbai and Aurangabad. Direct listings from verified
+            sellers at the best prices.
           </p>
 
           {/* Search Bar */}
@@ -122,7 +131,7 @@ export default function Hero({ onCityFilter }: HeroProps) {
               variant="outline"
               size="lg"
               onClick={() => {
-                window.location.hash = "owner-listing";
+                window.location.hash = "list-property";
               }}
               className="border-primary/40 text-primary hover:bg-primary/10 hover:border-primary font-semibold px-8"
             >
@@ -140,7 +149,7 @@ export default function Hero({ onCityFilter }: HeroProps) {
           >
             {[
               { icon: TrendingUp, label: "Active Listings", value: "2,400+" },
-              { icon: MapPin, label: "Cities Covered", value: "5 Cities" },
+              { icon: MapPin, label: "Cities Covered", value: "7 Cities" },
               { icon: Search, label: "Properties Sold", value: "12,000+" },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="text-center">

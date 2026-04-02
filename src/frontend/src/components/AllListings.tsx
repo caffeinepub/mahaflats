@@ -6,7 +6,16 @@ import { useEffect, useState } from "react";
 import { useApprovedProperties } from "../hooks/useQueries";
 import PropertyCard from "./PropertyCard";
 
-const CITIES = ["All", "Mumbai", "Pune", "Thane", "Nagpur", "Nashik"];
+const CITIES = [
+  "All",
+  "Mumbai",
+  "Pune",
+  "Thane",
+  "Nagpur",
+  "Nashik",
+  "Navi Mumbai",
+  "Aurangabad",
+];
 const SKELETON_KEYS = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"];
 
 interface AllListingsProps {
@@ -60,7 +69,7 @@ export default function AllListings({ cityFilter }: AllListingsProps) {
           {CITIES.map((city) => (
             <Button
               key={city}
-              data-ocid="hero.city_select"
+              data-ocid="listings.tab"
               variant={activeCity === city ? "default" : "outline"}
               size="sm"
               onClick={() => setActiveCity(city)}

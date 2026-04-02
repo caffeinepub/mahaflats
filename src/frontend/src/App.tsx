@@ -18,6 +18,7 @@ import FAQSection from "./components/FAQSection";
 import FeaturedProperties from "./components/FeaturedProperties";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
+import IntroSection from "./components/IntroSection";
 import ListingTypePage from "./components/ListingTypePage";
 import Navbar from "./components/Navbar";
 import PrivacyPolicyPage from "./components/PrivacyPolicyPage";
@@ -60,7 +61,8 @@ function resolveHashView(hash: string): View | null {
   if (hash === "#contact-us") return "contact-us";
   if (hash === "#privacy-policy") return "privacy-policy";
   if (hash === "#terms-and-conditions") return "terms-and-conditions";
-  if (hash === "#owner-listing") return "owner-listing";
+  if (hash === "#owner-listing" || hash === "#list-property")
+    return "owner-listing";
   if (hash === "#buyer-visit") return "buyer-visit";
   return null;
 }
@@ -112,6 +114,7 @@ export default function App() {
     return (
       <>
         <BlogPage onBack={handleBackToPublic} />
+        <WhatsAppButton />
         <Toaster richColors position="top-right" />
       </>
     );
@@ -121,6 +124,7 @@ export default function App() {
     return (
       <>
         <AboutUsPage onBack={handleBackToPublic} />
+        <WhatsAppButton />
         <Toaster richColors position="top-right" />
       </>
     );
@@ -130,6 +134,7 @@ export default function App() {
     return (
       <>
         <ContactUsPage onBack={handleBackToPublic} />
+        <WhatsAppButton />
         <Toaster richColors position="top-right" />
       </>
     );
@@ -139,6 +144,7 @@ export default function App() {
     return (
       <>
         <PrivacyPolicyPage onBack={handleBackToPublic} />
+        <WhatsAppButton />
         <Toaster richColors position="top-right" />
       </>
     );
@@ -148,6 +154,7 @@ export default function App() {
     return (
       <>
         <TermsAndConditionsPage onBack={handleBackToPublic} />
+        <WhatsAppButton />
         <Toaster richColors position="top-right" />
       </>
     );
@@ -157,6 +164,7 @@ export default function App() {
     return (
       <>
         <ListingTypePage onBack={handleBackToPublic} />
+        <WhatsAppButton />
         <Toaster richColors position="top-right" />
       </>
     );
@@ -166,6 +174,7 @@ export default function App() {
     return (
       <>
         <BuyerVisitForm onBack={handleBackToPublic} />
+        <WhatsAppButton />
         <Toaster richColors position="top-right" />
       </>
     );
@@ -221,6 +230,8 @@ export default function App() {
           <section id="featured">
             <FeaturedProperties />
           </section>
+
+          <IntroSection />
 
           <AllListings cityFilter={cityFilter} />
 

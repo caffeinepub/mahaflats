@@ -30,27 +30,24 @@ export default function Navbar({
 
   const scrollTo = (id: string) => {
     setMobileOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    // If we're on a sub-page, go home first then scroll
+    if (
+      window.location.hash &&
+      window.location.hash !== "" &&
+      window.location.hash !== "#"
+    ) {
+      window.location.hash = "";
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      }, 200);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
-  const goToBroker = () => {
+  const goToHash = (hash: string) => {
     setMobileOpen(false);
-    window.location.hash = "broker";
-  };
-
-  const goToBlog = () => {
-    setMobileOpen(false);
-    window.location.hash = "blog";
-  };
-
-  const goToOwnerListing = () => {
-    setMobileOpen(false);
-    window.location.hash = "owner-listing";
-  };
-
-  const goToBuyerVisit = () => {
-    setMobileOpen(false);
-    window.location.hash = "buyer-visit";
+    window.location.hash = hash;
   };
 
   return (
@@ -59,7 +56,10 @@ export default function Navbar({
         {/* Logo */}
         <button
           type="button"
-          onClick={() => scrollTo("hero")}
+          onClick={() => {
+            window.location.hash = "";
+            setMobileOpen(false);
+          }}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
@@ -94,7 +94,7 @@ export default function Navbar({
           <button
             type="button"
             data-ocid="nav.blog_link"
-            onClick={goToBlog}
+            onClick={() => goToHash("blog")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
           >
             <Newspaper className="w-3.5 h-3.5" />
@@ -111,7 +111,7 @@ export default function Navbar({
           <button
             type="button"
             data-ocid="nav.list_property_link"
-            onClick={goToOwnerListing}
+            onClick={() => goToHash("list-property")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
           >
             <Home className="w-3.5 h-3.5" />
@@ -120,7 +120,7 @@ export default function Navbar({
           <button
             type="button"
             data-ocid="nav.request_visit_link"
-            onClick={goToBuyerVisit}
+            onClick={() => goToHash("buyer-visit")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
           >
             <CalendarCheck className="w-3.5 h-3.5" />
@@ -128,7 +128,8 @@ export default function Navbar({
           </button>
           <Button
             size="sm"
-            onClick={goToBroker}
+            onClick={() => goToHash("broker")}
+            data-ocid="nav.broker_signup_button"
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <UserPlus className="w-4 h-4 mr-1" />
@@ -209,7 +210,7 @@ export default function Navbar({
               <button
                 type="button"
                 data-ocid="nav.blog_mobile_link"
-                onClick={goToBlog}
+                onClick={() => goToHash("blog")}
                 className="text-left text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
               >
                 <Newspaper className="w-4 h-4" />
@@ -225,7 +226,7 @@ export default function Navbar({
               <button
                 type="button"
                 data-ocid="nav.list_property_mobile_link"
-                onClick={goToOwnerListing}
+                onClick={() => goToHash("list-property")}
                 className="text-left text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
               >
                 <Home className="w-4 h-4" />
@@ -234,7 +235,7 @@ export default function Navbar({
               <button
                 type="button"
                 data-ocid="nav.request_visit_mobile_link"
-                onClick={goToBuyerVisit}
+                onClick={() => goToHash("buyer-visit")}
                 className="text-left text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
               >
                 <CalendarCheck className="w-4 h-4" />
@@ -242,7 +243,7 @@ export default function Navbar({
               </button>
               <Button
                 size="sm"
-                onClick={goToBroker}
+                onClick={() => goToHash("broker")}
                 className="w-full bg-primary text-primary-foreground"
               >
                 <UserPlus className="w-4 h-4 mr-1" />
