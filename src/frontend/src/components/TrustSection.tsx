@@ -49,8 +49,9 @@ export default function TrustSection() {
             Safe, Transparent & Reliable
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            We built Mahaflats to solve the problems every property buyer and
-            seller faces — fraud, hidden fees, and lack of accountability.
+            We built Maharashtra Flats to solve the problems every property
+            buyer and seller faces — fraud, hidden fees, and lack of
+            accountability.
           </p>
         </motion.div>
 

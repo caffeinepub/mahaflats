@@ -66,10 +66,10 @@ export default function TermsAndConditionsPage({
               </h2>
               <p>
                 All content, including text, graphics, logos, and images
-                available on this site, is the property of MahaFlats and is
-                protected by copyright laws. You may not reproduce, distribute,
-                or use any content for commercial purposes without our prior
-                written consent.
+                available on this site, is the property of Maharashtra Flats and
+                is protected by copyright laws. You may not reproduce,
+                distribute, or use any content for commercial purposes without
+                our prior written consent.
               </p>
             </section>
 
@@ -108,7 +108,7 @@ export default function TermsAndConditionsPage({
                 5. Disclaimer of Warranties
               </h2>
               <p>
-                The information provided on MahaFlats is for general
+                The information provided on Maharashtra Flats is for general
                 informational purposes only (e.g., real estate listings,
                 property guides). While we strive for accuracy, we do not
                 guarantee that the content is error-free, complete, or current.
@@ -121,9 +121,9 @@ export default function TermsAndConditionsPage({
                 6. Limitation of Liability
               </h2>
               <p>
-                In no event shall MahaFlats be liable for any direct, indirect,
-                or incidental damages arising out of your use or inability to
-                use the service.
+                In no event shall Maharashtra Flats be liable for any direct,
+                indirect, or incidental damages arising out of your use or
+                inability to use the service.
               </p>
             </section>
 
@@ -143,11 +143,11 @@ export default function TermsAndConditionsPage({
                 8. Property Listings
               </h2>
               <p className="mb-3">
-                Mahaflats provides a marketplace for property listings. All
-                listings are submitted by registered sellers and brokers. While
-                we make reasonable efforts to review listings for quality and
-                accuracy, Mahaflats does not independently verify all property
-                details, titles, or ownership claims.
+                Maharashtra Flats provides a marketplace for property listings.
+                All listings are submitted by registered sellers and brokers.
+                While we make reasonable efforts to review listings for quality
+                and accuracy, Maharashtra Flats does not independently verify
+                all property details, titles, or ownership claims.
               </p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>

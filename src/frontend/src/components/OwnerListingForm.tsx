@@ -171,7 +171,7 @@ export default function OwnerListingForm({ onBack }: Props) {
               </h1>
               <p className="text-muted-foreground mt-2">
                 Fill in the details below and our team will list your property
-                on Mahaflats platform.
+                on Maharashtra Flats platform.
               </p>
             </div>
 
@@ -400,10 +400,11 @@ export default function OwnerListingForm({ onBack }: Props) {
                   >
                     I confirm that the property details submitted by me are
                     correct. I agree that if any buyer is introduced through
-                    Mahaflats platform and the transaction is finalized directly
-                    or indirectly, I will pay a 1% service charge of the final
-                    transaction value to Mahaflats as platform service fees. I
-                    also agree not to bypass Mahaflats after buyer introduction.
+                    Maharashtra Flats platform and the transaction is finalized
+                    directly or indirectly, I will pay a 1% service charge of
+                    the final transaction value to Maharashtra Flats as platform
+                    service fees. I also agree not to bypass Maharashtra Flats
+                    after buyer introduction.
                   </Label>
                 </div>
               </div>

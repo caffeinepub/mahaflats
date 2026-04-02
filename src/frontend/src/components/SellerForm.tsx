@@ -191,7 +191,7 @@ export default function SellerForm() {
             </span>
           </div>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Sell Faster with Mahaflats
+            Sell Faster with Maharashtra Flats
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
             List your property for just ₹1,000/year and reach thousands of

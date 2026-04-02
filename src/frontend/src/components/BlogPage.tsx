@@ -54,7 +54,7 @@ const blogPosts: BlogPost[] = [
 <h3>Step 6: Complete the Purchase Process</h3>
 <p>Once you've selected a property and secured financing, the purchase involves: signing the sale agreement (with 10% down payment), paying stamp duty and registration charges at the Sub-Registrar's office, receiving the possession certificate, and completing the society membership transfer.</p>
 
-<p>Buying your first flat in Mumbai requires patience and careful planning, but the rewards — a permanent home in India's financial capital — are well worth the effort. Mahaflats connects serious buyers with verified Mumbai listings to make your home-buying journey smooth and transparent.</p>`,
+<p>Buying your first flat in Mumbai requires patience and careful planning, but the rewards — a permanent home in India's financial capital — are well worth the effort. Maharashtra Flats connects serious buyers with verified Mumbai listings to make your home-buying journey smooth and transparent.</p>`,
   },
   {
     id: 2,
@@ -83,7 +83,7 @@ const blogPosts: BlogPost[] = [
 <h3>Getting Your Home Loan in Pune</h3>
 <p>Pune's property values are well within home loan eligibility limits for most salaried professionals. With a monthly income of ₹60,000–₹80,000, you can typically qualify for a loan of ₹50–70 lakhs, sufficient to purchase a decent 2BHK in most Pune localities. Start the loan application process early, ideally before finalising your property choice.</p>
 
-<p>Pune's real estate market offers exceptional value and growth potential for first-time buyers who approach their purchase with thorough research and proper legal due diligence. Browse Mahaflats' verified Pune listings to begin your home-buying journey today.</p>`,
+<p>Pune's real estate market offers exceptional value and growth potential for first-time buyers who approach their purchase with thorough research and proper legal due diligence. Browse Maharashtra Flats' verified Pune listings to begin your home-buying journey today.</p>`,
   },
   {
     id: 3,
@@ -109,7 +109,7 @@ const blogPosts: BlogPost[] = [
 <h3>Rental Yield and Investment Potential</h3>
 <p>Thane's proximity to major employment hubs — including BKC, Powai's IT corridor, and Navi Mumbai's industrial areas — ensures strong rental demand. Investors in Thane typically enjoy rental yields of 3–4% annually, with additional upside from capital appreciation. The city's growing corporate presence further supports long-term rental income potential.</p>
 
-<p>Whether you're looking for a starter flat or a spacious family home, Thane's diverse real estate market has options at every price point. Browse Mahaflats' verified Thane listings to find your ideal property today.</p>`,
+<p>Whether you're looking for a starter flat or a spacious family home, Thane's diverse real estate market has options at every price point. Browse Maharashtra Flats' verified Thane listings to find your ideal property today.</p>`,
   },
   {
     id: 4,
@@ -138,7 +138,7 @@ const blogPosts: BlogPost[] = [
 <h3>Smart City Development</h3>
 <p>Nagpur has been selected as one of India's Smart Cities, with significant government investment in urban infrastructure, public transport, and civic amenities. The Nagpur Metro Rail project has already transformed connectivity across the city, with further extensions planned. Smart city status typically accelerates property price appreciation as urban quality of life improves.</p>
 
-<p>For first-time buyers seeking affordable quality housing with strong future appreciation potential, Nagpur offers one of Maharashtra's most compelling property propositions. Browse Mahaflats' verified Nagpur listings to explore your options today.</p>`,
+<p>For first-time buyers seeking affordable quality housing with strong future appreciation potential, Nagpur offers one of Maharashtra's most compelling property propositions. Browse Maharashtra Flats' verified Nagpur listings to explore your options today.</p>`,
   },
   {
     id: 5,
@@ -164,7 +164,7 @@ const blogPosts: BlogPost[] = [
 <h3>Connectivity Advantages</h3>
 <p>Nashik sits on the Mumbai-Agra National Highway and is approximately 170 km from Mumbai (3 hours by road) and 210 km from Pune (4 hours by road). The proposed Delhi-Mumbai Industrial Corridor passing near Nashik is expected to significantly boost the city's industrial profile and property values in coming years. Nashik Airport, though currently limited, has expansion plans that will further improve connectivity.</p>
 
-<p>Nashik's combination of affordability, quality of life, and growth trajectory makes it one of Maharashtra's best-kept real estate secrets. Explore verified Nashik property listings on Mahaflats and take the first step toward your dream home.</p>`,
+<p>Nashik's combination of affordability, quality of life, and growth trajectory makes it one of Maharashtra's best-kept real estate secrets. Explore verified Nashik property listings on Maharashtra Flats and take the first step toward your dream home.</p>`,
   },
   {
     id: 6,
@@ -190,7 +190,7 @@ const blogPosts: BlogPost[] = [
 <h3>Property Prices and Value Proposition</h3>
 <p>Navi Mumbai's property prices vary significantly by node. Well-established areas like Vashi and Nerul command ₹1.2–1.8 crore for a 2BHK, while more developing nodes like Kharghar offer comparable flats for ₹75 lakhs to ₹1.1 crore. Newer development areas like Panvel and Khalapur offer the best affordability, with 2BHK flats available from ₹55–80 lakhs. These prices represent significant value considering the quality of infrastructure and future appreciation potential.</p>
 
-<p>Navi Mumbai represents one of Maharashtra's finest real estate propositions for first-time buyers seeking space, quality infrastructure, and long-term value. Browse Mahaflats' verified Navi Mumbai listings to find your perfect first home.</p>`,
+<p>Navi Mumbai represents one of Maharashtra's finest real estate propositions for first-time buyers seeking space, quality infrastructure, and long-term value. Browse Maharashtra Flats' verified Navi Mumbai listings to find your perfect first home.</p>`,
   },
   {
     id: 7,
@@ -216,7 +216,7 @@ const blogPosts: BlogPost[] = [
 <h3>Tourism and Cultural Economy</h3>
 <p>Aurangabad's status as a major tourism hub — attracting lakhs of domestic and international visitors to Ajanta and Ellora annually — creates unique economic diversification. The hospitality, retail, and service sectors thrive alongside manufacturing, providing employment stability that supports long-term real estate demand. The proposed development of tourism infrastructure around heritage sites will further elevate Aurangabad's profile.</p>
 
-<p>Aurangabad's combination of industrial strength, cultural significance, affordable property prices, and growth infrastructure make it one of Maharashtra's most compelling real estate opportunities for budget-conscious first-time buyers. Explore Mahaflats' verified Aurangabad listings today.</p>`,
+<p>Aurangabad's combination of industrial strength, cultural significance, affordable property prices, and growth infrastructure make it one of Maharashtra's most compelling real estate opportunities for budget-conscious first-time buyers. Explore Maharashtra Flats' verified Aurangabad listings today.</p>`,
   },
   {
     id: 8,
@@ -254,7 +254,7 @@ const blogPosts: BlogPost[] = [
 <h3>Step 7: Identity and Address Proof Verification</h3>
 <p>Verify the seller's identity through PAN card, Aadhaar, and government-issued photo ID. For properties held in a company name, obtain certified company documents, board resolutions authorising the sale, and director identification. For inherited properties, obtain probated will or legal heirship certificate.</p>
 
-<p>Document verification may seem time-consuming, but it is your strongest protection against property fraud. Always engage a qualified property lawyer to conduct thorough due diligence before signing any agreement or making any payment. Mahaflats' admin team can guide buyers through this process for any listed property.</p>`,
+<p>Document verification may seem time-consuming, but it is your strongest protection against property fraud. Always engage a qualified property lawyer to conduct thorough due diligence before signing any agreement or making any payment. Maharashtra Flats' admin team can guide buyers through this process for any listed property.</p>`,
   },
   {
     id: 9,
@@ -286,7 +286,7 @@ const blogPosts: BlogPost[] = [
 <h3>Tax Benefits on Home Loans</h3>
 <p>First-time home buyers in India receive significant income tax benefits on home loan payments: Section 24(b) allows deduction up to ₹2 lakhs per year on interest paid (for self-occupied property), Section 80C allows deduction up to ₹1.5 lakhs per year on principal repayment, and Section 80EEA provides an additional ₹1.5 lakh deduction on interest for affordable housing (loan up to ₹35 lakhs, property value up to ₹45 lakhs). These combined deductions can save significant tax, especially for buyers in higher income brackets.</p>
 
-<p>Securing the right home loan at the right interest rate can save lakhs over the loan tenure. Compare at least 3–4 lenders, negotiate on processing fees, and read the fine print on pre-payment penalties before finalising. Mahaflats connects buyers with verified properties across Maharashtra to make your home ownership dream a reality.</p>`,
+<p>Securing the right home loan at the right interest rate can save lakhs over the loan tenure. Compare at least 3–4 lenders, negotiate on processing fees, and read the fine print on pre-payment penalties before finalising. Maharashtra Flats connects buyers with verified properties across Maharashtra to make your home ownership dream a reality.</p>`,
   },
   {
     id: 10,
@@ -312,7 +312,7 @@ const blogPosts: BlogPost[] = [
 <h3>Filing a Complaint with MahaRERA</h3>
 <p>If a developer violates RERA provisions, you can file a complaint online at maharera.mahaonline.gov.in. Common grounds for complaint include: possession delay beyond agreed date, misrepresentation of carpet area or specifications, failure to provide agreed amenities, non-registration of sale agreement, and unfair contract terms. Complaints are typically heard within 60 days, and MahaRERA can impose penalties up to 10% of the project cost or up to 3 years imprisonment for wilful violations.</p>
 
-<p>RERA has fundamentally changed the power balance in Maharashtra's property market in favour of buyers. Always verify RERA registration before any purchase, keep all written communications with developers, and do not hesitate to file a complaint if your rights are violated. Mahaflats ensures all listed properties meet platform quality standards for buyer protection.</p>`,
+<p>RERA has fundamentally changed the power balance in Maharashtra's property market in favour of buyers. Always verify RERA registration before any purchase, keep all written communications with developers, and do not hesitate to file a complaint if your rights are violated. Maharashtra Flats ensures all listed properties meet platform quality standards for buyer protection.</p>`,
   },
   {
     id: 11,
@@ -341,7 +341,7 @@ const blogPosts: BlogPost[] = [
 <h3>Best Maharashtra Cities for NRI Investment</h3>
 <p>Mumbai continues to attract NRI investment for premium properties in South Mumbai, Bandra, Juhu, and Powai. Pune's Koregaon Park, Kalyani Nagar, and Kharadi appeal to technology sector NRIs. Thane and Navi Mumbai offer excellent value with strong rental yields from local professionals. For heritage and emotional connection, cities like Nashik and Aurangabad attract NRIs with family roots in those regions.</p>
 
-<p>NRI investment in Maharashtra real estate can be highly rewarding when approached with proper legal and financial planning. Mahaflats connects NRI buyers with verified Maharashtra properties and can coordinate remote property visits and documentation processes.</p>`,
+<p>NRI investment in Maharashtra real estate can be highly rewarding when approached with proper legal and financial planning. Maharashtra Flats connects NRI buyers with verified Maharashtra properties and can coordinate remote property visits and documentation processes.</p>`,
   },
   {
     id: 12,
@@ -385,7 +385,7 @@ const blogPosts: BlogPost[] = [
 <h3>Tip 10: Plan for Long-Term, Not Just Immediate Needs</h3>
 <p>Your first flat should ideally serve you for 7–10 years minimum. Consider family growth plans, career mobility requirements, and potential rental income if you relocate. A property that works for your life today and your life tomorrow is always the best investment.</p>
 
-<p>Armed with these 10 tips, you're well-prepared to navigate Maharashtra's property market confidently. Mahaflats connects you with verified properties and transparent pricing to make your first purchase a success.</p>`,
+<p>Armed with these 10 tips, you're well-prepared to navigate Maharashtra's property market confidently. Maharashtra Flats connects you with verified properties and transparent pricing to make your first purchase a success.</p>`,
   },
   {
     id: 13,
@@ -420,7 +420,7 @@ const blogPosts: BlogPost[] = [
 <h3>Post-Registration Steps</h3>
 <p>After registration, complete: society membership transfer (for cooperative housing societies), mutation in municipal records to update property tax records in your name, updating the property records at the tehsil office (7/12 extract for lands), and linking your Aadhaar to property records for future reference.</p>
 
-<p>Completing all registration steps correctly is essential to protecting your property ownership rights in Maharashtra. Mahaflats' team assists buyers in understanding the registration process for any property found on our platform.</p>`,
+<p>Completing all registration steps correctly is essential to protecting your property ownership rights in Maharashtra. Maharashtra Flats' team assists buyers in understanding the registration process for any property found on our platform.</p>`,
   },
   {
     id: 14,
@@ -449,7 +449,7 @@ const blogPosts: BlogPost[] = [
 <h3>When to Walk Away</h3>
 <p>Know your walk-away point before entering any negotiation. If a seller is genuinely unwilling to negotiate to within your budget, walking away is the right decision. In Maharashtra's diverse market, there will always be another suitable property at a realistic price. Emotional attachment to a specific property weakens your negotiating position — maintain objectivity throughout the process.</p>
 
-<p>Skilled negotiation can save you enough money to cover several years of home loan EMIs. Approach every property purchase as a business transaction and negotiate with confidence. Mahaflats provides transparent pricing information to help buyers make informed offers on listed properties.</p>`,
+<p>Skilled negotiation can save you enough money to cover several years of home loan EMIs. Approach every property purchase as a business transaction and negotiate with confidence. Maharashtra Flats provides transparent pricing information to help buyers make informed offers on listed properties.</p>`,
   },
   {
     id: 15,
@@ -482,7 +482,7 @@ const blogPosts: BlogPost[] = [
 <h3>Total Transaction Cost Summary</h3>
 <p>For a typical ₹60 lakh flat in Pune: Stamp duty (6%) = ₹3,60,000; Registration charges (1%, capped at ₹30,000) = ₹30,000; GST if under construction (5%) = ₹3,00,000; Legal fees = ₹15,000–25,000; Home loan processing = ₹15,000–25,000. Total transaction costs: ₹4,20,000–7,45,000 (7–12% of property value) for under-construction vs ₹4,05,000–4,45,000 (6.7–7.4%) for ready-to-move.</p>
 
-<p>Proper budgeting for stamp duty and all transaction costs ensures you can complete your property purchase without financial stress. Mahaflats provides transparent listing information so buyers can plan their complete property budget with confidence.</p>`,
+<p>Proper budgeting for stamp duty and all transaction costs ensures you can complete your property purchase without financial stress. Maharashtra Flats provides transparent listing information so buyers can plan their complete property budget with confidence.</p>`,
   },
 ];
 
@@ -572,7 +572,7 @@ export default function BlogPage({ onBack }: BlogPageProps) {
               className="bg-primary text-primary-foreground hover:bg-primary/90"
               data-ocid="blog.back_to_home_button"
             >
-              Browse Properties on Mahaflats
+              Browse Properties on Maharashtra Flats
             </Button>
           </div>
         </div>
@@ -613,7 +613,7 @@ export default function BlogPage({ onBack }: BlogPageProps) {
         <section className="bg-card border-b border-border py-16">
           <div className="container mx-auto px-4 text-center">
             <h1 className="font-display font-bold text-4xl md:text-5xl text-foreground mb-4">
-              Mahaflats <span className="text-primary">Blog</span>
+              Maharashtra Flats <span className="text-primary">Blog</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Expert guides, market insights, and property buying tips for

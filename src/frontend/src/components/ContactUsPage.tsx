@@ -19,7 +19,7 @@ export default function ContactUsPage({ onBack }: { onBack: () => void }) {
               <Building2 className="w-4 h-4 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-lg text-foreground">
-              Maha<span className="text-primary">Flats</span>
+              Maharashtra<span className="text-primary"> Flats</span>
               <span className="text-muted-foreground text-xs font-normal">
                 .com
               </span>

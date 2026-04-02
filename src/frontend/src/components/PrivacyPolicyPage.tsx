@@ -46,7 +46,7 @@ export default function PrivacyPolicyPage({ onBack }: { onBack: () => void }) {
                 1. Introduction
               </h2>
               <p>
-                Welcome to Mahaflats.com ("we", "our", or "us"). We are
+                Welcome to Maharashtra Flats ("we", "our", or "us"). We are
                 committed to protecting your personal information and your right
                 to privacy. This Privacy Policy explains how we collect, use,
                 disclose, and safeguard your information when you visit our
@@ -161,9 +161,9 @@ export default function PrivacyPolicyPage({ onBack }: { onBack: () => void }) {
                 5. Cookies and Tracking Technologies
               </h2>
               <p className="mb-3">
-                Mahaflats.com uses cookies to maintain user sessions and improve
-                site functionality. By continuing to use the site, you consent
-                to the use of cookies in accordance with this policy.
+                Maharashtra Flats uses cookies to maintain user sessions and
+                improve site functionality. By continuing to use the site, you
+                consent to the use of cookies in accordance with this policy.
               </p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>
@@ -202,7 +202,7 @@ export default function PrivacyPolicyPage({ onBack }: { onBack: () => void }) {
                 6. Third-Party Services — Google AdSense
               </h2>
               <p className="mb-3">
-                Mahaflats.com participates in Google AdSense to display
+                Maharashtra Flats participates in Google AdSense to display
                 advertisements. Google may use cookies and similar technologies
                 to show ads based on your prior visits to this and other
                 websites.
@@ -284,10 +284,11 @@ export default function PrivacyPolicyPage({ onBack }: { onBack: () => void }) {
                 9. Children's Privacy
               </h2>
               <p>
-                Mahaflats.com is not directed at children under the age of 18.
-                We do not knowingly collect personal information from minors. If
-                you believe we have inadvertently collected such data, please
-                contact us immediately and we will delete it promptly.
+                Maharashtra Flats is not directed at children under the age of
+                18. We do not knowingly collect personal information from
+                minors. If you believe we have inadvertently collected such
+                data, please contact us immediately and we will delete it
+                promptly.
               </p>
             </section>
 

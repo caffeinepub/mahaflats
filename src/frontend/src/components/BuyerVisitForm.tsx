@@ -105,9 +105,9 @@ export default function BuyerVisitForm({ onBack }: Props) {
             </h2>
             <div className="bg-card/60 border border-border rounded-lg p-5 max-w-md mx-auto text-left mb-6">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Your property visit request has been recorded through Mahaflats.
-                Our team will coordinate with the property owner and get back to
-                you shortly.
+                Your property visit request has been recorded through
+                Maharashtra Flats. Our team will coordinate with the property
+                owner and get back to you shortly.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -142,8 +142,8 @@ export default function BuyerVisitForm({ onBack }: Props) {
                 Request a Site Visit
               </h1>
               <p className="text-muted-foreground mt-2">
-                Schedule a property visit through Mahaflats and our team will
-                coordinate with the owner.
+                Schedule a property visit through Maharashtra Flats and our team
+                will coordinate with the owner.
               </p>
             </div>
 
@@ -265,8 +265,9 @@ export default function BuyerVisitForm({ onBack }: Props) {
                     className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
                   >
                     I confirm that I am requesting a property visit through
-                    Mahaflats platform. I understand that Mahaflats is acting as
-                    a property introduction platform between buyer and owner.
+                    Maharashtra Flats platform. I understand that Maharashtra
+                    Flats is acting as a property introduction platform between
+                    buyer and owner.
                   </Label>
                 </div>
               </div>

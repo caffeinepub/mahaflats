@@ -185,7 +185,7 @@ function LoginView({
           <Logo />
           <CardTitle className="text-xl mt-2">Broker Login</CardTitle>
           <CardDescription>
-            Sign in to your Mahaflats broker account
+            Sign in to your Maharashtra Flats broker account
           </CardDescription>
         </CardHeader>
 
@@ -252,7 +252,7 @@ function LoginView({
             className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mx-auto"
             data-ocid="broker_login.link"
           >
-            <ArrowLeft className="w-3 h-3" /> Back to Mahaflats
+            <ArrowLeft className="w-3 h-3" /> Back to Maharashtra Flats
           </button>
         </CardFooter>
       </Card>
@@ -340,7 +340,7 @@ function SignupView({
           <Logo />
           <CardTitle className="text-xl mt-2">Create Broker Account</CardTitle>
           <CardDescription>
-            Join Mahaflats to list and manage properties
+            Join Maharashtra Flats to list and manage properties
           </CardDescription>
         </CardHeader>
 
@@ -438,7 +438,7 @@ function SignupView({
             className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mx-auto"
             data-ocid="broker_signup.link"
           >
-            <ArrowLeft className="w-3 h-3" /> Back to Mahaflats
+            <ArrowLeft className="w-3 h-3" /> Back to Maharashtra Flats
           </button>
         </CardFooter>
       </Card>
@@ -785,7 +785,7 @@ function DashboardView({
               <span className="font-semibold text-primary">
                 {broker.name.split(" ")[0]}
               </span>
-              ! Your Mahaflats broker dashboard is ready.
+              ! Your Maharashtra Flats broker dashboard is ready.
             </p>
           </div>
         </CardContent>

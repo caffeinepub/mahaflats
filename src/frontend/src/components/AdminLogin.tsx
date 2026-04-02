@@ -90,7 +90,7 @@ export default function AdminLogin({
             Admin Login
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Access the Mahaflats admin panel
+            Access the Maharashtra Flats admin panel
           </p>
         </div>
 
@@ -169,7 +169,7 @@ export default function AdminLogin({
         onClick={onBack}
         className="mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
-        ← Back to Mahaflats.com
+        ← Back to Maharashtra Flats.com
       </button>
     </div>
   );

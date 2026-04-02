@@ -22,7 +22,7 @@ export default function ContactSection() {
     setTimeout(() => {
       setLoading(false);
       toast.success(
-        "Message sent! Arman from Mahaflats will contact you soon.",
+        "Message sent! Arman from Maharashtra Flats will contact you soon.",
       );
       setForm({ name: "", phone: "", email: "", message: "" });
     }, 1200);
@@ -45,7 +45,7 @@ export default function ContactSection() {
             </span>
           </div>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Contact Mahaflats
+            Contact Maharashtra Flats
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Have questions about a property or need help listing? Reach out to

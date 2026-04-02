@@ -45,7 +45,7 @@ export default function AboutUsPage({ onBack }: { onBack: () => void }) {
               <Building2 className="w-4 h-4 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-lg text-foreground">
-              Maha<span className="text-primary">Flats</span>
+              Maharashtra<span className="text-primary"> Flats</span>
               <span className="text-muted-foreground text-xs font-normal">
                 .com
               </span>
@@ -67,7 +67,7 @@ export default function AboutUsPage({ onBack }: { onBack: () => void }) {
         <section className="bg-card border-b border-border py-16">
           <div className="container mx-auto px-4 max-w-3xl text-center">
             <h1 className="font-display font-bold text-4xl md:text-5xl text-foreground mb-4">
-              About <span className="text-primary">MahaFlats</span>
+              About <span className="text-primary">Maharashtra Flats</span>
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed">
               Maharashtra's trusted real estate marketplace — connecting genuine
@@ -82,16 +82,17 @@ export default function AboutUsPage({ onBack }: { onBack: () => void }) {
               Who We Are
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Mahaflats.com is a growing digital platform dedicated to helping
-              users find reliable property-related information and services in a
-              simple and transparent way. Our mission is to make property
-              discovery easier, faster, and more accessible for everyone.
+              Maharashtra Flats is a growing digital platform dedicated to
+              helping users find reliable property-related information and
+              services in a simple and transparent way. Our mission is to make
+              property discovery easier, faster, and more accessible for
+              everyone.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-4">
               We focus on connecting users with genuine property opportunities,
               useful listings, and location-based insights to support smarter
-              decisions. At Mahaflats.com, we believe in building trust through
-              clarity, simplicity, and user-friendly experiences.
+              decisions. At Maharashtra Flats, we believe in building trust
+              through clarity, simplicity, and user-friendly experiences.
             </p>
             <p className="text-muted-foreground leading-relaxed">
               Our platform is continuously improving to provide better services,
@@ -161,7 +162,7 @@ export default function AboutUsPage({ onBack }: { onBack: () => void }) {
         <section className="py-14">
           <div className="container mx-auto px-4 max-w-3xl">
             <h2 className="font-display font-bold text-2xl text-foreground mb-8">
-              Why Choose MahaFlats
+              Why Choose Maharashtra Flats
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {WHY_CHOOSE.map(({ icon: Icon, title, desc }) => (
@@ -219,7 +220,7 @@ export default function AboutUsPage({ onBack }: { onBack: () => void }) {
                 <span className="font-semibold text-foreground">
                   Powered by:
                 </span>{" "}
-                Mahaflats.com
+                Maharashtra Flats.com
               </p>
             </div>
           </div>

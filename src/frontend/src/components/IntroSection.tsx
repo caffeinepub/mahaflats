@@ -23,7 +23,7 @@ export default function IntroSection() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 mb-4">
             <Building2 className="w-4 h-4 text-primary" />
             <span className="text-sm text-primary font-medium">
-              About Mahaflats
+              About Maharashtra Flats
             </span>
           </div>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -42,38 +42,38 @@ export default function IntroSection() {
           >
             <p className="text-muted-foreground leading-relaxed text-base mb-5">
               Welcome to{" "}
-              <strong className="text-foreground">Mahaflats.com</strong> —
+              <strong className="text-foreground">Maharashtra Flats</strong> —
               Maharashtra's dedicated real estate marketplace, built to simplify
               property discovery for buyers and make listing properties
               effortless for owners and brokers. Whether you're a first-time
               home buyer searching for your dream flat in Mumbai, a young
               professional looking for an affordable 2BHK in Pune, or a property
-              owner wanting to reach genuine local buyers, Mahaflats is the
-              platform designed specifically for you.
+              owner wanting to reach genuine local buyers, Maharashtra Flats is
+              the platform designed specifically for you.
             </p>
 
             <p className="text-muted-foreground leading-relaxed text-base mb-5">
               Finding a flat in Maharashtra has traditionally been a complex,
               time-consuming process filled with middlemen, inflated prices, and
-              privacy concerns. Mahaflats changes that completely. We've created
-              a transparent, privacy-first marketplace where every listing is
-              manually reviewed by our admin team before going live, ensuring
-              that every property you see is genuine, accurately described, and
-              fairly priced.
+              privacy concerns. Maharashtra Flats changes that completely. We've
+              created a transparent, privacy-first marketplace where every
+              listing is manually reviewed by our admin team before going live,
+              ensuring that every property you see is genuine, accurately
+              described, and fairly priced.
             </p>
 
             <h3 className="font-display text-xl font-semibold text-foreground mb-3">
               For Buyers: Search with Confidence
             </h3>
             <p className="text-muted-foreground leading-relaxed text-base mb-5">
-              As a buyer on Mahaflats, you have access to hundreds of verified
-              properties across seven major Maharashtra cities — Mumbai, Pune,
-              Thane, Nagpur, Nashik, Navi Mumbai, and Aurangabad. Our powerful
-              search and filter tools let you narrow down listings by city,
-              property type, price range, and more. Each listing includes
-              comprehensive details, photos, and location information so you can
-              make informed decisions without wasting time on site visits for
-              unsuitable properties.
+              As a buyer on Maharashtra Flats, you have access to hundreds of
+              verified properties across seven major Maharashtra cities —
+              Mumbai, Pune, Thane, Nagpur, Nashik, Navi Mumbai, and Aurangabad.
+              Our powerful search and filter tools let you narrow down listings
+              by city, property type, price range, and more. Each listing
+              includes comprehensive details, photos, and location information
+              so you can make informed decisions without wasting time on site
+              visits for unsuitable properties.
             </p>
 
             <p className="text-muted-foreground leading-relaxed text-base mb-5">
@@ -105,12 +105,12 @@ export default function IntroSection() {
             </p>
 
             <p className="text-muted-foreground leading-relaxed text-base">
-              Listing on Mahaflats takes just minutes. Fill in your property
-              details, upload photos, and agree to our transparent service
-              terms. Our team reviews each submission within 24 hours and works
-              diligently to connect you with verified, serious buyers. No spam
-              inquiries, no time-wasters — just genuine connections that lead to
-              successful deals.
+              Listing on Maharashtra Flats takes just minutes. Fill in your
+              property details, upload photos, and agree to our transparent
+              service terms. Our team reviews each submission within 24 hours
+              and works diligently to connect you with verified, serious buyers.
+              No spam inquiries, no time-wasters — just genuine connections that
+              lead to successful deals.
             </p>
           </motion.div>
 
@@ -123,7 +123,7 @@ export default function IntroSection() {
           >
             <div className="bg-card border border-border rounded-2xl p-6">
               <h3 className="font-display text-lg font-semibold text-foreground mb-4">
-                Why Choose Mahaflats?
+                Why Choose Maharashtra Flats?
               </h3>
               <ul className="space-y-3">
                 {[
@@ -186,10 +186,10 @@ export default function IntroSection() {
                 For Brokers
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                Licensed brokers can join Mahaflats on a subscription basis for
-                ₹4,000 per 6 months, gaining unlimited property listing access
-                and a professional dashboard to manage all their inventory.
-                Broker accounts require admin approval to ensure only
+                Licensed brokers can join Maharashtra Flats on a subscription
+                basis for ₹4,000 per 6 months, gaining unlimited property
+                listing access and a professional dashboard to manage all their
+                inventory. Broker accounts require admin approval to ensure only
                 legitimate, verified brokers operate on the platform.
               </p>
               <button

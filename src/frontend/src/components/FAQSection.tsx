@@ -10,7 +10,7 @@ import { motion } from "motion/react";
 const FAQS = [
   {
     id: "search",
-    question: "How do I search for properties on Mahaflats?",
+    question: "How do I search for properties on Maharashtra Flats?",
     answer:
       "Simply use the city filter on the homepage or browse the All Listings section. You can filter by city — Mumbai, Pune, Thane, Nagpur, and Nashik — to find properties in your preferred location.",
   },
@@ -24,7 +24,7 @@ const FAQS = [
     id: "cost",
     question: "How much does it cost to list a property?",
     answer:
-      "Mahaflats charges a flat ₹1,000 per year to list your property. This is a one-time annual fee with no commission, no hidden charges, and no surprises.",
+      "Maharashtra Flats charges a flat ₹1,000 per year to list your property. This is a one-time annual fee with no commission, no hidden charges, and no surprises.",
   },
   {
     id: "payment",
@@ -66,7 +66,7 @@ export default function FAQSection() {
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Everything you need to know about buying, selling, and listing on
-            Mahaflats.
+            Maharashtra Flats.
           </p>
         </motion.div>
 

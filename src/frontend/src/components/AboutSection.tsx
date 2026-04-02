@@ -28,10 +28,10 @@ export default function AboutSection() {
               <span className="block text-gradient">Real Estate Platform</span>
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Mahaflats.com was founded with a simple mission: to make property
-              buying and selling transparent, affordable, and accessible to
-              every Maharashtrian. We bridge the gap between genuine buyers and
-              verified sellers across all major cities.
+              Maharashtra Flats was founded with a simple mission: to make
+              property buying and selling transparent, affordable, and
+              accessible to every Maharashtrian. We bridge the gap between
+              genuine buyers and verified sellers across all major cities.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-8">
               Unlike other portals, we personally verify each listing and

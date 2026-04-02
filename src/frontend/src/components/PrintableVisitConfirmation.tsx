@@ -30,7 +30,7 @@ const TABLE_ROWS = [
 const SIG_BLOCKS = [
   { key: "buyer", title: "Buyer" },
   { key: "owner", title: "Owner" },
-  { key: "mahaflats", title: "Mahaflats Representative" },
+  { key: "mahaflats", title: "Maharashtra Flats Representative" },
 ];
 
 export default function PrintableVisitConfirmation({
@@ -125,7 +125,7 @@ export default function PrintableVisitConfirmation({
               </div>
               <div>
                 <div className="font-bold text-xl" style={{ color: "#1e3a5f" }}>
-                  MahaFlats<span className="text-gray-500">.com</span>
+                  Maharashtra Flats<span className="text-gray-500">.com</span>
                 </div>
                 <div className="text-xs text-gray-500">
                   Maharashtra’s Trusted Property Platform
@@ -144,7 +144,7 @@ export default function PrintableVisitConfirmation({
               className="text-xl font-bold uppercase tracking-wider mb-1"
               style={{ color: "#1e3a5f" }}
             >
-              Mahaflats Property Site Visit
+              Maharashtra Flats Property Site Visit
             </h1>
             <h2 className="text-lg font-semibold text-gray-700">
               Confirmation Agreement
@@ -179,12 +179,13 @@ export default function PrintableVisitConfirmation({
             <p className="text-sm text-gray-700 leading-relaxed">
               This document serves as an official record that the
               above-mentioned buyer has been introduced to the property through{" "}
-              <strong>Mahaflats platform</strong>. By proceeding with this site
-              visit, both parties acknowledge that Mahaflats acted as the
-              introducer and a <strong>1% platform service charge</strong> will
-              be applicable on the final transaction value if the property is
-              purchased. This agreement is binding and the parties agree not to
-              bypass Mahaflats after the introduction arranged through this
+              <strong>Maharashtra Flats platform</strong>. By proceeding with
+              this site visit, both parties acknowledge that Maharashtra Flats
+              acted as the introducer and a{" "}
+              <strong>1% platform service charge</strong> will be applicable on
+              the final transaction value if the property is purchased. This
+              agreement is binding and the parties agree not to bypass
+              Maharashtra Flats after the introduction arranged through this
               platform.
             </p>
           </div>
@@ -224,7 +225,7 @@ export default function PrintableVisitConfirmation({
           {/* Footer */}
           <div className="mt-8 pt-4 border-t border-gray-200 text-center">
             <p className="text-xs text-gray-400">
-              Mahaflats.com | Maharashtra’s Trusted Property Platform |
+              Maharashtra Flats.com | Maharashtra’s Trusted Property Platform |
               WhatsApp: +91 7447428486
             </p>
             <p className="text-xs text-gray-400 mt-1">

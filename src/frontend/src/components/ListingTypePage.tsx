@@ -102,7 +102,7 @@ export default function ListingTypePage({ onBack }: Props) {
                   What's Included
                 </p>
                 {[
-                  "Top-position visibility on Mahaflats",
+                  "Top-position visibility on Maharashtra Flats",
                   "₹500 Facebook promotion to nearby buyers",
                   "Faster genuine buyer inquiries",
                   "Only 1% success fee after deal closes",
@@ -246,9 +246,9 @@ export default function ListingTypePage({ onBack }: Props) {
               </div>
 
               <p className="text-sm text-muted-foreground leading-relaxed mb-6 flex-1">
-                List your property on Mahaflats at no cost and make it visible
-                to local buyers with standard listing position and no upfront
-                charges; only 1% success fee applicable from owner after
+                List your property on Maharashtra Flats at no cost and make it
+                visible to local buyers with standard listing position and no
+                upfront charges; only 1% success fee applicable from owner after
                 successful deal.
               </p>
 
@@ -362,7 +362,7 @@ export default function ListingTypePage({ onBack }: Props) {
           <p className="text-center text-xs text-muted-foreground mt-8">
             Both plans include our platform's buyer-seller introduction service.
             The 1% success fee is applicable only after a successful property
-            deal is finalized through Mahaflats.
+            deal is finalized through Maharashtra Flats.
           </p>
         </motion.div>
       </main>
