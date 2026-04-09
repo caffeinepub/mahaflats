@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -9,24 +10,48 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, IndianRupee, Loader2, Upload, X } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { HttpAgent } from "@icp-sdk/core/agent";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Image,
+  IndianRupee,
+  Loader2,
+  Upload,
+  X,
+} from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { useRecordPayment, useSubmitProperty } from "../hooks/useQueries";
+import { ListingFeeType, ListingPurpose } from "../backend.d";
+import { loadConfig } from "../config";
+import { useSubmitProperty } from "../hooks/useQueries";
+import { StorageClient } from "../utils/StorageClient";
 
-const CITIES = ["Mumbai", "Pune", "Thane", "Nagpur", "Nashik"];
-const PROPERTY_TYPES = ["1BHK", "2BHK", "3BHK", "Villa", "Plot"];
+const CITIES = [
+  "Mumbai",
+  "Pune",
+  "Thane",
+  "Nagpur",
+  "Nashik",
+  "Navi Mumbai",
+  "Aurangabad",
+];
+const PROPERTY_TYPES = ["1BHK", "2BHK", "3BHK", "Villa", "Plot", "Commercial"];
 const MAX_PHOTOS = 5;
 const MAX_FILE_SIZE_MB = 5;
 
-type Step = 1 | 2 | 3;
+interface SellerFormProps {
+  listingType?: "free" | "paid";
+  paymentRef?: string;
+}
 
-export default function SellerForm() {
-  const [step, setStep] = useState<Step>(1);
-  const [propertyId, setPropertyId] = useState<bigint | null>(null);
-  const [utr, setUtr] = useState("");
+export default function SellerForm(_props?: SellerFormProps) {
+  const [submitted, setSubmitted] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
@@ -36,611 +61,563 @@ export default function SellerForm() {
     city: "",
     location: "",
     propertyType: "",
+    listingPurpose: "forSale" as "forSale" | "forRent",
     price: "",
+    rentAmount: "",
     area: "",
     bedrooms: "",
     description: "",
-    photoUrls: [] as string[],
   });
 
   const submitProperty = useSubmitProperty();
-  const recordPayment = useRecordPayment();
-
   const update = (field: string, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
 
+  const isForRent = form.listingPurpose === "forRent";
+
   const handleFilesSelected = (files: FileList | null) => {
     if (!files || files.length === 0) return;
-
-    const currentCount = photoPreviews.length;
-    const remaining = MAX_PHOTOS - currentCount;
-
+    const remaining = MAX_PHOTOS - photoFiles.length;
     if (remaining <= 0) {
       toast.error(`Maximum ${MAX_PHOTOS} photos allowed.`);
       return;
     }
-
-    const filesToProcess = Array.from(files).slice(0, remaining);
-
+    const toProcess = Array.from(files).slice(0, remaining);
     if (files.length > remaining) {
-      toast.error(
-        `Only ${remaining} more photo(s) can be added (max ${MAX_PHOTOS} total).`,
-      );
+      toast.error(`Only ${remaining} more photo(s) can be added.`);
     }
 
+    const newFiles: File[] = [];
     const newPreviews: string[] = [];
     let processed = 0;
 
-    for (const file of filesToProcess) {
+    for (const file of toProcess) {
       if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
         toast.error(
-          `"${file.name}" exceeds ${MAX_FILE_SIZE_MB}MB limit and was skipped.`,
+          `"${file.name}" exceeds ${MAX_FILE_SIZE_MB}MB and was skipped.`,
         );
         processed++;
-        if (processed === filesToProcess.length && newPreviews.length > 0) {
-          setPhotoPreviews((prev) => {
-            const updated = [...prev, ...newPreviews];
-            setForm((f) => ({ ...f, photoUrls: updated }));
-            return updated;
-          });
+        if (processed === toProcess.length && newFiles.length > 0) {
+          setPhotoFiles((p) => [...p, ...newFiles]);
+          setPhotoPreviews((p) => [...p, ...newPreviews]);
         }
         continue;
       }
-
+      newFiles.push(file);
       const reader = new FileReader();
       reader.onload = (e) => {
-        const dataUrl = e.target?.result as string;
-        newPreviews.push(dataUrl);
+        newPreviews.push(e.target?.result as string);
         processed++;
-        if (processed === filesToProcess.length) {
-          setPhotoPreviews((prev) => {
-            const updated = [...prev, ...newPreviews];
-            setForm((f) => ({ ...f, photoUrls: updated }));
-            return updated;
-          });
+        if (processed === toProcess.length) {
+          setPhotoFiles((p) => [...p, ...newFiles]);
+          setPhotoPreviews((p) => [...p, ...newPreviews]);
         }
       };
       reader.readAsDataURL(file);
     }
-
-    // Reset file input so same file can be re-selected
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
   };
 
   const removePhoto = (index: number) => {
-    setPhotoPreviews((prev) => {
-      const updated = prev.filter((_, i) => i !== index);
-      setForm((f) => ({ ...f, photoUrls: updated }));
-      return updated;
-    });
+    setPhotoFiles((f) => f.filter((_, i) => i !== index));
+    setPhotoPreviews((p) => p.filter((_, i) => i !== index));
   };
 
-  const handleDropzoneDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
+  const uploadPhotos = async (): Promise<string[]> => {
+    if (photoFiles.length === 0) return [];
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const config = await loadConfig();
+      const agent = new HttpAgent({ host: config.backend_host });
+      if (config.backend_host?.includes("localhost")) {
+        await agent.fetchRootKey().catch(console.warn);
+      }
+      const storageClient = new StorageClient(
+        config.bucket_name,
+        config.storage_gateway_url,
+        config.backend_canister_id,
+        config.project_id,
+        agent,
+      );
+
+      const urls: string[] = [];
+      for (let i = 0; i < photoFiles.length; i++) {
+        const file = photoFiles[i];
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const { hash } = await storageClient.putFile(bytes, (pct) => {
+          const overall = Math.round(
+            ((i + pct / 100) / photoFiles.length) * 100,
+          );
+          setUploadProgress(overall);
+        });
+        const url = await storageClient.getDirectURL(hash);
+        urls.push(url);
+      }
+      return urls;
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
-  const handleDropzoneDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    handleFilesSelected(e.dataTransfer.files);
+  const validate = (): string | null => {
+    if (!form.sellerName.trim()) return "Owner name is required.";
+    if (!form.sellerPhone.trim() || form.sellerPhone.length < 10)
+      return "Valid phone number is required.";
+    if (!form.title.trim()) return "Property title is required.";
+    if (!form.city) return "City is required.";
+    if (!form.location.trim()) return "Location is required.";
+    if (!form.propertyType) return "Property type is required.";
+    if (
+      !form.price ||
+      Number.isNaN(Number(form.price)) ||
+      Number(form.price) <= 0
+    )
+      return "Valid price is required.";
+    if (
+      isForRent &&
+      (!form.rentAmount ||
+        Number.isNaN(Number(form.rentAmount)) ||
+        Number(form.rentAmount) <= 0)
+    )
+      return "Monthly rent amount is required for rental properties.";
+    if (!form.area || Number.isNaN(Number(form.area)) || Number(form.area) <= 0)
+      return "Property area is required.";
+    if (!form.bedrooms || Number.isNaN(Number(form.bedrooms)))
+      return "Number of bedrooms is required.";
+    if (!form.description.trim() || form.description.length < 20)
+      return "Please provide a description (at least 20 characters).";
+    if (!agreed) return "Please agree to the terms before submitting.";
+    return null;
   };
 
-  const handleStep1Submit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const error = validate();
+    if (error) {
+      toast.error(error);
+      return;
+    }
+
+    let photoUrls: string[] = [];
+    if (photoFiles.length > 0) {
+      try {
+        photoUrls = await uploadPhotos();
+      } catch (err) {
+        console.error("Photo upload error:", err);
+        toast.error(
+          "Photo upload failed. Please try again or submit without photos.",
+        );
+        return;
+      }
+    }
+
+    const listingPurpose =
+      form.listingPurpose === "forRent"
+        ? ListingPurpose.forRent
+        : ListingPurpose.forSale;
+    const listingFeeType =
+      listingPurpose === ListingPurpose.forRent
+        ? ListingFeeType.twoMonthRentCommission
+        : ListingFeeType.yearlyFee1000;
+    const rentAmount =
+      listingPurpose === ListingPurpose.forRent && form.rentAmount
+        ? BigInt(Math.round(Number(form.rentAmount)))
+        : null;
+
     submitProperty.mutate(
       {
         title: form.title,
         city: form.city,
         location: form.location,
         propertyType: form.propertyType,
-        price: BigInt(form.price || "0"),
-        area: BigInt(form.area || "0"),
-        bedrooms: BigInt(form.bedrooms || "0"),
+        price: BigInt(Math.round(Number(form.price))),
+        area: BigInt(Math.round(Number(form.area))),
+        bedrooms: BigInt(Math.round(Number(form.bedrooms))),
         description: form.description,
-        photoUrls: form.photoUrls,
+        photoUrls,
         sellerName: form.sellerName,
         sellerPhone: form.sellerPhone,
+        listingPurpose,
+        rentAmount,
+        listingFeeType,
       },
       {
         onSuccess: () => {
-          setPropertyId(BigInt(Date.now()));
-          setStep(2);
-          toast.success("Property details saved! Please complete payment.");
+          setSubmitted(true);
+          toast.success(
+            "Property submitted successfully! Awaiting admin approval.",
+          );
         },
-        onError: () =>
-          toast.error("Failed to submit property. Please try again."),
+        onError: (err) => {
+          console.error("Submit error:", err);
+          toast.error("Submission failed. Please try again.");
+        },
       },
     );
   };
 
-  const handlePaymentSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!utr.trim()) {
-      toast.error("Please enter your UTR/Transaction reference number.");
-      return;
-    }
-    if (propertyId) {
-      recordPayment.mutate(
-        { propertyId, paymentRef: utr },
-        {
-          onSuccess: () => setStep(3),
-          onError: () =>
-            toast.error("Failed to record payment. Please contact support."),
-        },
-      );
-    } else {
-      setStep(3);
-    }
-  };
+  if (submitted) {
+    return (
+      <div className="text-center py-16 px-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
+          <CheckCircle2 className="w-8 h-8 text-green-500" />
+        </div>
+        <h2 className="font-display text-2xl font-bold text-foreground mb-3">
+          Property Submitted!
+        </h2>
+        <p className="text-muted-foreground max-w-md mx-auto mb-6">
+          Your property listing is under review. Our admin team will approve it
+          within 24–48 hours. You will be notified once it goes live.
+        </p>
+        {isForRent ? (
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 text-sm">
+            <AlertCircle className="w-4 h-4" />
+            Commission: 2 months rent (₹
+            {form.rentAmount
+              ? (Number(form.rentAmount) * 2).toLocaleString("en-IN")
+              : "--"}
+            ) on successful deal.
+          </div>
+        ) : (
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm">
+            <IndianRupee className="w-4 h-4" />
+            ₹1,000 yearly listing fee applies. Admin will share payment details.
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const isSubmitting = submitProperty.isPending || isUploading;
 
   return (
-    <section id="list-property" className="py-20 bg-background">
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 mb-4">
-            <IndianRupee className="w-4 h-4 text-primary" />
-            <span className="text-sm text-primary font-medium">
-              List Your Property
-            </span>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Payment info banner */}
+      <div
+        className={`rounded-lg border p-3 text-sm flex items-start gap-2 ${
+          isForRent
+            ? "bg-orange-500/10 border-orange-500/20 text-orange-300"
+            : "bg-blue-500/10 border-blue-500/20 text-blue-300"
+        }`}
+      >
+        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+        <span>
+          {isForRent
+            ? "Rental Commercial: 2 months rent commission applies on successful deal."
+            : "₹1,000 yearly listing fee applies for sale properties. Payment details shared after submission."}
+        </span>
+      </div>
+
+      {/* Owner Details */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-foreground text-sm uppercase tracking-wider border-b border-border pb-2">
+          Owner Details
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-foreground text-sm">Owner Full Name *</Label>
+            <Input
+              required
+              value={form.sellerName}
+              onChange={(e) => update("sellerName", e.target.value)}
+              placeholder="Your full name"
+              className="bg-secondary border-border text-foreground mt-1"
+            />
           </div>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Sell Faster with Maharashtra Flats
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            List your property for just ₹1,000/year and reach thousands of
-            genuine buyers.
-          </p>
-        </motion.div>
-
-        {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-4 mb-10">
-          {([1, 2, 3] as Step[]).map((s) => (
-            <div key={s} className="flex items-center gap-2">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                  step >= s
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-muted-foreground"
-                }`}
-              >
-                {s}
-              </div>
-              <span
-                className={`text-sm hidden sm:block ${
-                  step >= s ? "text-foreground" : "text-muted-foreground"
-                }`}
-              >
-                {s === 1
-                  ? "Property Details"
-                  : s === 2
-                    ? "Payment"
-                    : "Confirmation"}
-              </span>
-              {s < 3 && (
-                <div
-                  className={`w-12 h-0.5 ${step > s ? "bg-primary" : "bg-border"}`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="max-w-2xl mx-auto">
-          <AnimatePresence mode="wait">
-            {step === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="bg-card border border-border rounded-2xl p-6 md:p-8"
-              >
-                <h3 className="font-display text-xl font-semibold text-foreground mb-6">
-                  Property Details
-                </h3>
-                <form onSubmit={handleStep1Submit} className="space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <Label className="text-foreground">Seller Name *</Label>
-                      <Input
-                        required
-                        value={form.sellerName}
-                        onChange={(e) => update("sellerName", e.target.value)}
-                        placeholder="Your full name"
-                        className="bg-secondary border-border text-foreground mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-foreground">Phone Number *</Label>
-                      <Input
-                        required
-                        type="tel"
-                        value={form.sellerPhone}
-                        onChange={(e) => update("sellerPhone", e.target.value)}
-                        placeholder="+91 98765 43210"
-                        className="bg-secondary border-border text-foreground mt-1"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        🔒 Private — visible only to admin
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-foreground">Property Title *</Label>
-                    <Input
-                      required
-                      value={form.title}
-                      onChange={(e) => update("title", e.target.value)}
-                      placeholder="e.g. Spacious 2BHK in Bandra West"
-                      className="bg-secondary border-border text-foreground mt-1"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <Label className="text-foreground">City *</Label>
-                      <Select
-                        value={form.city}
-                        onValueChange={(v) => update("city", v)}
-                      >
-                        <SelectTrigger className="bg-secondary border-border text-foreground mt-1">
-                          <SelectValue placeholder="Select city" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-popover border-border">
-                          {CITIES.map((c) => (
-                            <SelectItem
-                              key={c}
-                              value={c}
-                              className="text-foreground"
-                            >
-                              {c}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-foreground">
-                        Location / Area *
-                      </Label>
-                      <Input
-                        required
-                        value={form.location}
-                        onChange={(e) => update("location", e.target.value)}
-                        placeholder="e.g. Bandra West"
-                        className="bg-secondary border-border text-foreground mt-1"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <div>
-                      <Label className="text-foreground">Property Type *</Label>
-                      <Select
-                        value={form.propertyType}
-                        onValueChange={(v) => update("propertyType", v)}
-                      >
-                        <SelectTrigger className="bg-secondary border-border text-foreground mt-1">
-                          <SelectValue placeholder="Type" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-popover border-border">
-                          {PROPERTY_TYPES.map((t) => (
-                            <SelectItem
-                              key={t}
-                              value={t}
-                              className="text-foreground"
-                            >
-                              {t}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-foreground">Price (₹) *</Label>
-                      <Input
-                        required
-                        type="number"
-                        value={form.price}
-                        onChange={(e) => update("price", e.target.value)}
-                        placeholder="5000000"
-                        className="bg-secondary border-border text-foreground mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-foreground">Bedrooms *</Label>
-                      <Input
-                        required
-                        type="number"
-                        min="1"
-                        value={form.bedrooms}
-                        onChange={(e) => update("bedrooms", e.target.value)}
-                        placeholder="2"
-                        className="bg-secondary border-border text-foreground mt-1"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-foreground">Area (sq ft) *</Label>
-                    <Input
-                      required
-                      type="number"
-                      value={form.area}
-                      onChange={(e) => update("area", e.target.value)}
-                      placeholder="1200"
-                      className="bg-secondary border-border text-foreground mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-foreground">Description *</Label>
-                    <Textarea
-                      required
-                      value={form.description}
-                      onChange={(e) => update("description", e.target.value)}
-                      placeholder="Describe your property — location highlights, amenities, nearby facilities..."
-                      rows={4}
-                      className="bg-secondary border-border text-foreground mt-1"
-                    />
-                  </div>
-
-                  {/* Photo Upload */}
-                  <div>
-                    <Label className="text-foreground">
-                      Property Photos{" "}
-                      <span className="text-muted-foreground font-normal">
-                        ({photoPreviews.length}/{MAX_PHOTOS})
-                      </span>
-                    </Label>
-
-                    {/* Dropzone with overlaid file input for full mobile compatibility */}
-                    {photoPreviews.length < MAX_PHOTOS && (
-                      <div
-                        data-ocid="seller_form.dropzone"
-                        className="relative mt-1 w-full border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
-                        onDragOver={handleDropzoneDragOver}
-                        onDrop={handleDropzoneDrop}
-                      >
-                        {/* Transparent overlaid file input — directly triggered by user touch/click */}
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-                          multiple
-                          data-ocid="seller_form.upload_button"
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                          style={{ fontSize: 0 }}
-                          onChange={(e) => handleFilesSelected(e.target.files)}
-                          aria-label="Upload property photos"
-                        />
-                        <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2 pointer-events-none" />
-                        <span className="text-sm text-primary font-medium underline pointer-events-none">
-                          Tap to upload photos
-                        </span>
-                        <p className="text-xs text-muted-foreground mt-1 pointer-events-none">
-                          or drag and drop here
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1 pointer-events-none">
-                          JPG, PNG · Max {MAX_FILE_SIZE_MB}MB per photo · Up to{" "}
-                          {MAX_PHOTOS} photos
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Photo Previews */}
-                    {photoPreviews.length > 0 && (
-                      <div className="mt-3 grid grid-cols-3 sm:grid-cols-5 gap-2">
-                        {photoPreviews.map((src, i) => (
-                          <div
-                            key={src.slice(0, 40)}
-                            className="relative group aspect-square rounded-lg overflow-hidden border border-border"
-                          >
-                            <img
-                              src={src}
-                              alt={`Listing ${i + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removePhoto(i)}
-                              className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
-                              aria-label={`Remove listing ${i + 1}`}
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ))}
-                        {photoPreviews.length < MAX_PHOTOS && (
-                          <div
-                            className="relative aspect-square rounded-lg border-2 border-dashed border-border hover:border-primary/50 transition-colors flex items-center justify-center cursor-pointer"
-                            aria-label="Add more photos"
-                          >
-                            <input
-                              type="file"
-                              accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-                              multiple
-                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                              style={{ fontSize: 0 }}
-                              onChange={(e) =>
-                                handleFilesSelected(e.target.files)
-                              }
-                              aria-label="Add more photos"
-                            />
-                            <Upload className="w-5 h-5 text-muted-foreground pointer-events-none" />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  <Button
-                    data-ocid="seller_form.submit_button"
-                    type="submit"
-                    disabled={submitProperty.isPending}
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 text-base font-semibold"
-                  >
-                    {submitProperty.isPending ? (
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    ) : null}
-                    {submitProperty.isPending
-                      ? "Saving..."
-                      : "Continue to Payment →"}
-                  </Button>
-                </form>
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="bg-card border border-border rounded-2xl p-6 md:p-8"
-              >
-                <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-                  Complete Payment
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  Pay the annual listing fee to publish your property.
-                </p>
-
-                <div className="bg-secondary/50 border border-border rounded-xl p-5 mb-6">
-                  <div className="flex justify-between items-center">
-                    <span className="text-foreground font-medium">
-                      Annual Listing Fee
-                    </span>
-                    <span className="font-display text-2xl font-bold text-primary">
-                      ₹1,000
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Your listing will be live for 12 months after payment
-                    verification.
-                  </p>
-                </div>
-
-                <div className="text-center mb-6">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Scan the QR code to pay via UPI
-                  </p>
-                  <div className="inline-block bg-white p-3 rounded-xl">
-                    <img
-                      src="/assets/uploads/AccountQRCodeUnion-Bank-Of-India-3535_DARK_THEME-1.png"
-                      alt="UPI QR Code"
-                      className="w-44 h-44 object-contain"
-                    />
-                  </div>
-                  <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-secondary rounded-lg">
-                    <span className="text-sm text-muted-foreground">
-                      UPI ID:
-                    </span>
-                    <span className="font-mono text-foreground font-semibold">
-                      7447428486@ibl
-                    </span>
-                  </div>
-                </div>
-
-                <form onSubmit={handlePaymentSubmit} className="space-y-4">
-                  <div>
-                    <Label className="text-foreground">
-                      UTR / Transaction Reference Number *
-                    </Label>
-                    <Input
-                      data-ocid="payment.utr_input"
-                      required
-                      value={utr}
-                      onChange={(e) => setUtr(e.target.value)}
-                      placeholder="Enter 12-digit UTR number"
-                      className="bg-secondary border-border text-foreground mt-1"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Find the UTR number in your UPI payment app transaction
-                      history.
-                    </p>
-                  </div>
-                  <Button
-                    data-ocid="payment.submit_button"
-                    type="submit"
-                    disabled={recordPayment.isPending}
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 text-base font-semibold"
-                  >
-                    {recordPayment.isPending ? (
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    ) : null}
-                    {recordPayment.isPending
-                      ? "Submitting..."
-                      : "Submit Payment Reference"}
-                  </Button>
-                </form>
-              </motion.div>
-            )}
-
-            {step === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
-                className="bg-card border border-border rounded-2xl p-8 text-center"
-              >
-                <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle2 className="w-10 h-10 text-green-400" />
-                </div>
-                <h3 className="font-display text-2xl font-bold text-foreground mb-3">
-                  Thank You!
-                </h3>
-                <p className="text-muted-foreground mb-2">
-                  Your property has been submitted successfully.
-                </p>
-                <p className="text-muted-foreground text-sm mb-6">
-                  Our team will verify your payment and publish your listing
-                  within <strong className="text-foreground">24 hours</strong>.
-                </p>
-                <div className="bg-secondary/50 border border-border rounded-xl p-4 text-sm text-muted-foreground">
-                  Have questions? Contact us on WhatsApp at{" "}
-                  <strong className="text-foreground">+91 7447428486</strong>
-                </div>
-                <Button
-                  variant="outline"
-                  className="mt-6 border-border text-foreground hover:bg-secondary"
-                  onClick={() => {
-                    setStep(1);
-                    setUtr("");
-                    setPhotoPreviews([]);
-                    setForm({
-                      sellerName: "",
-                      sellerPhone: "",
-                      title: "",
-                      city: "",
-                      location: "",
-                      propertyType: "",
-                      price: "",
-                      area: "",
-                      bedrooms: "",
-                      description: "",
-                      photoUrls: [],
-                    });
-                  }}
-                >
-                  List Another Property
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div>
+            <Label className="text-foreground text-sm">
+              Mobile Number * (Admin only — not shown publicly)
+            </Label>
+            <Input
+              required
+              type="tel"
+              value={form.sellerPhone}
+              onChange={(e) => update("sellerPhone", e.target.value)}
+              placeholder="+91 98765 43210"
+              className="bg-secondary border-border text-foreground mt-1"
+            />
+          </div>
         </div>
       </div>
-    </section>
+
+      {/* Property Details */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-foreground text-sm uppercase tracking-wider border-b border-border pb-2">
+          Property Details
+        </h3>
+
+        <div>
+          <Label className="text-foreground text-sm">Property Title *</Label>
+          <Input
+            required
+            value={form.title}
+            onChange={(e) => update("title", e.target.value)}
+            placeholder="e.g. Spacious 2BHK in Bandra West"
+            className="bg-secondary border-border text-foreground mt-1"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-foreground text-sm">City *</Label>
+            <Select value={form.city} onValueChange={(v) => update("city", v)}>
+              <SelectTrigger className="bg-secondary border-border text-foreground mt-1">
+                <SelectValue placeholder="Select city" />
+              </SelectTrigger>
+              <SelectContent>
+                {CITIES.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-foreground text-sm">Locality / Area *</Label>
+            <Input
+              required
+              value={form.location}
+              onChange={(e) => update("location", e.target.value)}
+              placeholder="e.g. Bandra West, Andheri"
+              className="bg-secondary border-border text-foreground mt-1"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-foreground text-sm">Property Type *</Label>
+            <Select
+              value={form.propertyType}
+              onValueChange={(v) => update("propertyType", v)}
+            >
+              <SelectTrigger className="bg-secondary border-border text-foreground mt-1">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                {PROPERTY_TYPES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-foreground text-sm">Listing For *</Label>
+            <Select
+              value={form.listingPurpose}
+              onValueChange={(v) =>
+                update("listingPurpose", v as "forSale" | "forRent")
+              }
+            >
+              <SelectTrigger className="bg-secondary border-border text-foreground mt-1">
+                <SelectValue placeholder="For Sale / For Rent" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="forSale">For Sale</SelectItem>
+                <SelectItem value="forRent">For Rent</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <Label className="text-foreground text-sm">
+              {isForRent ? "Expected Value (₹)" : "Expected Price (₹) *"}
+            </Label>
+            <Input
+              required
+              type="number"
+              min="0"
+              value={form.price}
+              onChange={(e) => update("price", e.target.value)}
+              placeholder="e.g. 8500000"
+              className="bg-secondary border-border text-foreground mt-1"
+            />
+          </div>
+          {isForRent && (
+            <div>
+              <Label className="text-foreground text-sm">
+                Monthly Rent (₹) *
+              </Label>
+              <Input
+                required
+                type="number"
+                min="0"
+                value={form.rentAmount}
+                onChange={(e) => update("rentAmount", e.target.value)}
+                placeholder="e.g. 25000"
+                className="bg-secondary border-border text-foreground mt-1"
+              />
+            </div>
+          )}
+          <div>
+            <Label className="text-foreground text-sm">Area (sq ft) *</Label>
+            <Input
+              required
+              type="number"
+              min="0"
+              value={form.area}
+              onChange={(e) => update("area", e.target.value)}
+              placeholder="e.g. 1200"
+              className="bg-secondary border-border text-foreground mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-foreground text-sm">Bedrooms *</Label>
+            <Select
+              value={form.bedrooms}
+              onValueChange={(v) => update("bedrooms", v)}
+            >
+              <SelectTrigger className="bg-secondary border-border text-foreground mt-1">
+                <SelectValue placeholder="Bedrooms" />
+              </SelectTrigger>
+              <SelectContent>
+                {["0", "1", "2", "3", "4", "5"].map((n) => (
+                  <SelectItem key={n} value={n}>
+                    {n === "0" ? "Studio/Shop" : `${n} BHK`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-foreground text-sm">Description *</Label>
+          <Textarea
+            required
+            value={form.description}
+            onChange={(e) => update("description", e.target.value)}
+            placeholder="Describe the property — location highlights, amenities, nearby facilities..."
+            rows={4}
+            className="bg-secondary border-border text-foreground mt-1"
+          />
+        </div>
+      </div>
+
+      {/* Photo Upload */}
+      <div className="space-y-3">
+        <h3 className="font-semibold text-foreground text-sm uppercase tracking-wider border-b border-border pb-2">
+          Property Photos (up to {MAX_PHOTOS})
+        </h3>
+
+        {photoPreviews.length < MAX_PHOTOS && (
+          <button
+            type="button"
+            className="w-full border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-colors"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">
+              Click to upload photos (JPG, PNG — max {MAX_FILE_SIZE_MB}MB each)
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {photoFiles.length}/{MAX_PHOTOS} photos added
+            </p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => handleFilesSelected(e.target.files)}
+            />
+          </button>
+        )}
+
+        {photoPreviews.length > 0 && (
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+            {photoPreviews.map((src, i) => (
+              <div
+                key={src}
+                className="relative aspect-square rounded-lg overflow-hidden border border-border"
+              >
+                <img
+                  src={src}
+                  alt={`Preview ${i + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removePhoto(i)}
+                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center hover:bg-red-500 transition-colors"
+                >
+                  <X className="w-3 h-3 text-white" />
+                </button>
+              </div>
+            ))}
+            {photoPreviews.length < MAX_PHOTOS && (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="aspect-square rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:border-primary/60 hover:text-primary transition-colors"
+              >
+                <Image className="w-5 h-5 mb-1" />
+                <span className="text-xs">Add</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {isUploading && (
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Uploading photos...</span>
+              <span>{uploadProgress}%</span>
+            </div>
+            <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary transition-all duration-300"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Agreement */}
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-secondary/50 border border-border">
+        <Checkbox
+          id="agree"
+          checked={agreed}
+          onCheckedChange={(c) => setAgreed(c === true)}
+          className="mt-0.5"
+        />
+        <Label
+          htmlFor="agree"
+          className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
+        >
+          I confirm that the property details submitted by me are correct. I
+          agree that if any buyer is introduced through Maharashtra Flats
+          platform and the transaction is finalized directly or indirectly, I
+          will pay a 1% service charge of the final transaction value to
+          Maharashtra Flats as platform service fees. I also agree not to bypass
+          Maharashtra Flats after buyer introduction.
+        </Label>
+      </div>
+
+      <Button
+        type="submit"
+        disabled={isSubmitting || !agreed}
+        className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base"
+      >
+        {isSubmitting ? (
+          <span className="flex items-center gap-2">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            {isUploading
+              ? `Uploading photos (${uploadProgress}%)...`
+              : "Submitting..."}
+          </span>
+        ) : (
+          "Submit Property for Review"
+        )}
+      </Button>
+    </form>
   );
 }

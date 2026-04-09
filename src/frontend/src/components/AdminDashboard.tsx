@@ -13,7 +13,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   CheckCircle2,
   CreditCard,
+  IndianRupee,
   Phone,
+  Shield,
   Star,
   Trash2,
   Users,
@@ -21,6 +23,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { ListingFeeType, ListingPurpose, PaymentStatus } from "../backend.d";
 import type { Property, PropertyStatus } from "../backend.d";
 import { useActor } from "../hooks/useActor";
 import {
@@ -147,189 +150,501 @@ function SellerPhone({ propertyId }: { propertyId: bigint }) {
   const fetchPhone = async () => {
     if (!actor) return;
     setLoading(true);
-    const result = await actor.getSellerPhone(propertyId);
-    setPhone(result ?? "N/A");
-    setLoading(false);
+    try {
+      const result = await actor.getSellerPhone(propertyId);
+      setPhone(result ?? "N/A");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (phone) return <span className="font-mono text-foreground">{phone}</span>;
+  if (phone) return <span className="font-mono text-green-400">{phone}</span>;
   return (
     <Button
       variant="ghost"
       size="sm"
       onClick={fetchPhone}
       disabled={loading}
-      className="text-primary hover:text-primary/80"
+      className="text-primary hover:text-primary/80 text-xs"
     >
-      <Phone className="w-3.5 h-3.5 mr-1" />
-      {loading ? "Loading..." : "View Phone"}
+      <Phone className="w-3 h-3 mr-1" />
+      {loading ? "Loading..." : "View"}
     </Button>
   );
 }
 
-interface PropertyTableProps {
-  items: Property[] | undefined;
-  showPhone?: boolean;
-  propsLoading: boolean;
-  onApprove: (id: bigint) => void;
-  onReject: (id: bigint) => void;
-  onConfirmPayment: (id: bigint) => void;
-  onToggleFeatured: (id: bigint) => void;
-  onDelete: (id: bigint) => void;
+function statusBadge(status: string) {
+  if (status === "approved")
+    return (
+      <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+        Approved
+      </Badge>
+    );
+  if (status === "rejected")
+    return (
+      <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
+        Rejected
+      </Badge>
+    );
+  return (
+    <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">
+      Pending
+    </Badge>
+  );
 }
 
-function PropertyTable({
-  items,
-  showPhone,
-  propsLoading,
+function paymentBadge(status: string) {
+  if (status === "paid")
+    return (
+      <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+        Paid
+      </Badge>
+    );
+  return (
+    <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">
+      Pending
+    </Badge>
+  );
+}
+
+function purposeLabel(p: Property) {
+  return p.listingPurpose === ListingPurpose.forRent ? "For Rent" : "For Sale";
+}
+
+function feeRuleLabel(p: Property) {
+  if (p.sellerInfo.listingFeeType === ListingFeeType.twoMonthRentCommission) {
+    const rent = p.rentAmount ? Number(p.rentAmount) : 0;
+    return `2 months rent${rent ? ` (\u20b9${(rent * 2).toLocaleString("en-IN")})` : ""}`;
+  }
+  return "\u20b91,000/year";
+}
+
+// ── Listings Tab ──────────────────────────────────────────────────────────────
+function ListingsTab({
+  properties,
+  isLoading,
   onApprove,
   onReject,
   onConfirmPayment,
   onToggleFeatured,
   onDelete,
-}: PropertyTableProps) {
-  if (propsLoading) {
+}: {
+  properties: Property[] | undefined;
+  isLoading: boolean;
+  onApprove: (id: bigint) => void;
+  onReject: (id: bigint) => void;
+  onConfirmPayment: (id: bigint) => void;
+  onToggleFeatured: (id: bigint) => void;
+  onDelete: (id: bigint) => void;
+}) {
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const filtered = (properties ?? []).filter((p) => {
+    if (statusFilter === "all") return true;
+    return p.status === statusFilter;
+  });
+
+  if (isLoading) {
     return (
-      <div className="space-y-3" data-ocid="admin.loading_state">
+      <div className="space-y-3">
         {SKELETON_KEYS.map((key) => (
           <Skeleton key={key} className="h-12 w-full bg-muted" />
         ))}
       </div>
     );
   }
-  if (!items || items.length === 0) {
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-4 flex-wrap">
+        {["all", "pending", "approved", "rejected"].map((s) => (
+          <Button
+            key={s}
+            size="sm"
+            variant={statusFilter === s ? "default" : "outline"}
+            onClick={() => setStatusFilter(s)}
+            className={
+              statusFilter === s
+                ? "bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }
+          >
+            {s.charAt(0).toUpperCase() + s.slice(1)}
+            {s !== "all" && (
+              <span className="ml-1.5 text-xs">
+                ({(properties ?? []).filter((p) => p.status === s).length})
+              </span>
+            )}
+          </Button>
+        ))}
+      </div>
+      {filtered.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          No properties in this category.
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-muted-foreground">ID</TableHead>
+                <TableHead className="text-muted-foreground">
+                  Property
+                </TableHead>
+                <TableHead className="text-muted-foreground">City</TableHead>
+                <TableHead className="text-muted-foreground">Type</TableHead>
+                <TableHead className="text-muted-foreground">Purpose</TableHead>
+                <TableHead className="text-muted-foreground">Price</TableHead>
+                <TableHead className="text-muted-foreground">Status</TableHead>
+                <TableHead className="text-muted-foreground">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((prop, i) => (
+                <TableRow
+                  key={prop.id.toString()}
+                  className="border-border hover:bg-secondary/30"
+                  data-ocid={`admin.row.${i + 1}`}
+                >
+                  <TableCell className="text-muted-foreground text-xs">
+                    #{prop.id.toString()}
+                  </TableCell>
+                  <TableCell className="text-foreground font-medium max-w-[180px]">
+                    <span className="truncate block">{prop.title}</span>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {prop.city}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {prop.propertyType}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      className={
+                        prop.listingPurpose === ListingPurpose.forRent
+                          ? "bg-orange-500/20 text-orange-300 border-orange-500/30"
+                          : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                      }
+                    >
+                      {purposeLabel(prop)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-foreground">
+                    {formatPrice(prop.price)}
+                  </TableCell>
+                  <TableCell>{statusBadge(prop.status)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1 flex-wrap">
+                      {prop.status === "pending" && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => onApprove(prop.id)}
+                            data-ocid={`admin.approve_button.${i + 1}`}
+                            className="text-green-400 hover:text-green-300 hover:bg-green-500/10"
+                            title="Approve"
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => onReject(prop.id)}
+                            data-ocid={`admin.reject_button.${i + 1}`}
+                            className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                            title="Reject"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                      {prop.sellerInfo.paymentStatus !== PaymentStatus.paid && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => onConfirmPayment(prop.id)}
+                          data-ocid={`admin.confirm_payment_button.${i + 1}`}
+                          className="text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
+                          title="Confirm Payment"
+                        >
+                          <CreditCard className="w-4 h-4" />
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => onToggleFeatured(prop.id)}
+                        className={
+                          prop.isFeatured
+                            ? "text-primary"
+                            : "text-muted-foreground hover:text-primary"
+                        }
+                        title="Toggle Featured"
+                      >
+                        <Star
+                          className="w-4 h-4"
+                          fill={prop.isFeatured ? "currentColor" : "none"}
+                        />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => onDelete(prop.id)}
+                        className="text-destructive hover:text-destructive/80 hover:bg-destructive/10"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Owner Contacts Tab ────────────────────────────────────────────────────────
+function OwnerContactsTab({
+  properties,
+  isLoading,
+}: {
+  properties: Property[] | undefined;
+  isLoading: boolean;
+}) {
+  const visible = (properties ?? []).filter(
+    (p) => p.status === "pending" || p.status === "approved",
+  );
+
+  if (isLoading) {
     return (
-      <div
-        className="text-center py-12 text-muted-foreground"
-        data-ocid="admin.empty_state"
-      >
-        No properties in this category.
+      <div className="space-y-3">
+        {SKELETON_KEYS.map((key) => (
+          <Skeleton key={key} className="h-12 w-full bg-muted" />
+        ))}
       </div>
     );
   }
+
   return (
-    <div className="overflow-x-auto">
-      <Table data-ocid="admin.table">
-        <TableHeader>
-          <TableRow className="border-border hover:bg-transparent">
-            <TableHead className="text-muted-foreground">Property</TableHead>
-            <TableHead className="text-muted-foreground">City</TableHead>
-            <TableHead className="text-muted-foreground">Price</TableHead>
-            <TableHead className="text-muted-foreground">Seller</TableHead>
-            {showPhone && (
-              <TableHead className="text-muted-foreground">Phone</TableHead>
-            )}
-            <TableHead className="text-muted-foreground">Payment</TableHead>
-            <TableHead className="text-muted-foreground">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {items.map((prop, i) => (
-            <TableRow
-              key={prop.id.toString()}
-              className="border-border hover:bg-secondary/30"
-              data-ocid={`admin.row.${i + 1}`}
-            >
-              <TableCell className="text-foreground font-medium max-w-[200px] truncate">
-                {prop.title}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {prop.city}
-              </TableCell>
-              <TableCell className="text-foreground">
-                {formatPrice(prop.price)}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {prop.sellerInfo.sellerName}
-              </TableCell>
-              {showPhone && (
-                <TableCell>
-                  <SellerPhone propertyId={prop.id} />
-                </TableCell>
-              )}
-              <TableCell>
-                <Badge
-                  variant={
-                    prop.sellerInfo.paymentStatus === "paid"
-                      ? "default"
-                      : "secondary"
-                  }
-                  className={
-                    prop.sellerInfo.paymentStatus === "paid"
-                      ? "bg-green-500/20 text-green-300 border-green-500/30"
-                      : "bg-muted text-muted-foreground"
-                  }
+    <div>
+      <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm">
+        <Shield className="w-4 h-4 flex-shrink-0" />
+        <span>
+          Owner phone numbers are confidential. Only visible to admin. Never
+          shown to public users.
+        </span>
+      </div>
+      {visible.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          No owner contact records.
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-muted-foreground">ID</TableHead>
+                <TableHead className="text-muted-foreground">Title</TableHead>
+                <TableHead className="text-muted-foreground">City</TableHead>
+                <TableHead className="text-muted-foreground">
+                  Seller Name
+                </TableHead>
+                <TableHead className="text-muted-foreground">
+                  Phone Number
+                </TableHead>
+                <TableHead className="text-muted-foreground">Status</TableHead>
+                <TableHead className="text-muted-foreground">
+                  Submitted
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {visible.map((prop, i) => (
+                <TableRow
+                  key={prop.id.toString()}
+                  className="border-border hover:bg-secondary/30"
+                  data-ocid={`admin.row.${i + 1}`}
                 >
-                  {prop.sellerInfo.paymentStatus}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-1 flex-wrap">
-                  {prop.status === "pending" && (
-                    <>
-                      <Button
-                        data-ocid={`admin.approve_button.${i + 1}`}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onApprove(prop.id)}
-                        className="text-green-400 hover:text-green-300 hover:bg-green-500/10"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        data-ocid={`admin.reject_button.${i + 1}`}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onReject(prop.id)}
-                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </Button>
-                    </>
-                  )}
-                  {prop.sellerInfo.paymentStatus !== "paid" && (
-                    <Button
-                      data-ocid={`admin.confirm_payment_button.${i + 1}`}
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => onConfirmPayment(prop.id)}
-                      className="text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
-                      title="Confirm Payment"
+                  <TableCell className="text-muted-foreground text-xs">
+                    #{prop.id.toString()}
+                  </TableCell>
+                  <TableCell className="text-foreground font-medium max-w-[180px]">
+                    <span className="truncate block">{prop.title}</span>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {prop.city}
+                  </TableCell>
+                  <TableCell className="text-foreground">
+                    {prop.sellerInfo.sellerName}
+                  </TableCell>
+                  <TableCell>
+                    <SellerPhone propertyId={prop.id} />
+                  </TableCell>
+                  <TableCell>{statusBadge(prop.status)}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs">
+                    {prop.submittedAt
+                      ? new Date(
+                          Number(prop.submittedAt) / 1_000_000,
+                        ).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "—"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Payments Tab ──────────────────────────────────────────────────────────────
+function PaymentsTab({
+  properties,
+  isLoading,
+  onConfirmPayment,
+}: {
+  properties: Property[] | undefined;
+  isLoading: boolean;
+  onConfirmPayment: (id: bigint) => void;
+}) {
+  const [payFilter, setPayFilter] = useState<string>("all");
+
+  const filtered = (properties ?? []).filter((p) => {
+    if (payFilter === "all") return true;
+    if (payFilter === "pending")
+      return p.sellerInfo.paymentStatus === PaymentStatus.pending;
+    if (payFilter === "paid")
+      return p.sellerInfo.paymentStatus === PaymentStatus.paid;
+    return true;
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {SKELETON_KEYS.map((key) => (
+          <Skeleton key={key} className="h-12 w-full bg-muted" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-4 flex-wrap">
+        {["all", "pending", "paid"].map((s) => (
+          <Button
+            key={s}
+            size="sm"
+            variant={payFilter === s ? "default" : "outline"}
+            onClick={() => setPayFilter(s)}
+            className={
+              payFilter === s
+                ? "bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }
+          >
+            {s.charAt(0).toUpperCase() + s.slice(1)}
+          </Button>
+        ))}
+      </div>
+      {filtered.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          No payment records.
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-muted-foreground">ID</TableHead>
+                <TableHead className="text-muted-foreground">Title</TableHead>
+                <TableHead className="text-muted-foreground">
+                  Seller Name
+                </TableHead>
+                <TableHead className="text-muted-foreground">Purpose</TableHead>
+                <TableHead className="text-muted-foreground">
+                  Fee Rule
+                </TableHead>
+                <TableHead className="text-muted-foreground">
+                  Payment Status
+                </TableHead>
+                <TableHead className="text-muted-foreground">
+                  UTR / Ref
+                </TableHead>
+                <TableHead className="text-muted-foreground">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((prop, i) => (
+                <TableRow
+                  key={prop.id.toString()}
+                  className="border-border hover:bg-secondary/30"
+                  data-ocid={`admin.row.${i + 1}`}
+                >
+                  <TableCell className="text-muted-foreground text-xs">
+                    #{prop.id.toString()}
+                  </TableCell>
+                  <TableCell className="text-foreground font-medium max-w-[160px]">
+                    <span className="truncate block">{prop.title}</span>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {prop.sellerInfo.sellerName}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      className={
+                        prop.listingPurpose === ListingPurpose.forRent
+                          ? "bg-orange-500/20 text-orange-300 border-orange-500/30"
+                          : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                      }
                     >
-                      <CreditCard className="w-4 h-4" />
-                    </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onToggleFeatured(prop.id)}
-                    className={
-                      prop.isFeatured
-                        ? "text-primary"
-                        : "text-muted-foreground hover:text-primary"
-                    }
-                    title="Toggle Featured"
-                  >
-                    <Star
-                      className="w-4 h-4"
-                      fill={prop.isFeatured ? "currentColor" : "none"}
-                    />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onDelete(prop.id)}
-                    className="text-destructive hover:text-destructive/80 hover:bg-destructive/10"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                      {purposeLabel(prop)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-sm text-foreground">
+                    <span className="flex items-center gap-1">
+                      <IndianRupee className="w-3 h-3 text-primary" />
+                      {feeRuleLabel(prop)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    {paymentBadge(prop.sellerInfo.paymentStatus)}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground font-mono text-xs">
+                    {prop.sellerInfo.paymentRef ?? (
+                      <span className="opacity-40">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {prop.sellerInfo.paymentStatus !== PaymentStatus.paid && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => onConfirmPayment(prop.id)}
+                        data-ocid={`admin.confirm_payment_button.${i + 1}`}
+                        className="text-green-400 hover:text-green-300 hover:bg-green-500/10 text-xs px-2"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                        Confirm
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }
@@ -346,10 +661,7 @@ function BrokersTab() {
 
   if (brokers.length === 0) {
     return (
-      <div
-        className="text-center py-12 text-muted-foreground"
-        data-ocid="admin.empty_state"
-      >
+      <div className="text-center py-12 text-muted-foreground">
         <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
         <p>No broker registrations yet.</p>
       </div>
@@ -358,7 +670,7 @@ function BrokersTab() {
 
   return (
     <div className="overflow-x-auto">
-      <Table data-ocid="admin.table">
+      <Table>
         <TableHeader>
           <TableRow className="border-border hover:bg-transparent">
             <TableHead className="text-muted-foreground">Name</TableHead>
@@ -416,11 +728,7 @@ function BrokersTab() {
                         Until{" "}
                         {new Date(broker.expiresAt).toLocaleDateString(
                           "en-IN",
-                          {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          },
+                          { day: "numeric", month: "short", year: "numeric" },
                         )}
                       </span>
                     )}
@@ -478,7 +786,8 @@ function BrokersTab() {
                     Deactivate
                   </Button>
                 )}
-                {broker.subscriptionStatus === "deactivated" && (
+                {(broker.subscriptionStatus === "deactivated" ||
+                  broker.subscriptionStatus === "expired") && (
                   <Button
                     size="sm"
                     variant="ghost"
@@ -488,20 +797,6 @@ function BrokersTab() {
                     <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
                     Reactivate
                   </Button>
-                )}
-                {broker.subscriptionStatus === "expired" && (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-red-400">Expired</span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => reactivateBroker(broker.id)}
-                      className="text-green-400 hover:text-green-300 hover:bg-green-500/10 text-xs px-2"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-                      Reactivate
-                    </Button>
-                  </div>
                 )}
                 {broker.subscriptionStatus === "pending_payment" && (
                   <span className="text-xs text-muted-foreground">
@@ -549,7 +844,8 @@ export default function AdminDashboard() {
 
   const handleConfirmPayment = (id: bigint) => {
     confirmPayment.mutate(id, {
-      onSuccess: () => toast.success("Payment confirmed."),
+      onSuccess: () =>
+        toast.success("Payment confirmed and property approved."),
       onError: () => toast.error("Failed to confirm payment."),
     });
   };
@@ -569,25 +865,17 @@ export default function AdminDashboard() {
     });
   };
 
-  const pending = (properties ?? []).filter((p) => p.status === "pending");
-  const approved = (properties ?? []).filter((p) => p.status === "approved");
-  const rejected = (properties ?? []).filter((p) => p.status === "rejected");
-
+  const allProps = properties ?? [];
+  const pending = allProps.filter((p) => p.status === "pending");
+  const pendingPayments = allProps.filter(
+    (p) => p.sellerInfo.paymentStatus === PaymentStatus.pending,
+  );
   const pendingBrokers = brokers.filter(
     (b) => b.subscriptionStatus === "pending_approval",
   );
   const activeBrokers = brokers.filter(
     (b) => b.subscriptionStatus === "active",
   );
-
-  const tableProps = {
-    propsLoading,
-    onApprove: handleApprove,
-    onReject: handleReject,
-    onConfirmPayment: handleConfirmPayment,
-    onToggleFeatured: handleToggleFeatured,
-    onDelete: handleDelete,
-  };
 
   return (
     <div className="min-h-screen bg-background pt-20">
@@ -611,14 +899,14 @@ export default function AdminDashboard() {
               color: "text-amber-400",
             },
             {
-              label: "Approved Props",
-              count: approved.length,
+              label: "Total Props",
+              count: allProps.length,
               color: "text-green-400",
             },
             {
-              label: "Rejected Props",
-              count: rejected.length,
-              color: "text-red-400",
+              label: "Pending Payments",
+              count: pendingPayments.length,
+              color: "text-orange-400",
             },
             {
               label: "Buyer Leads",
@@ -648,44 +936,54 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        <Tabs defaultValue="pending" className="w-full">
-          <TabsList className="bg-secondary mb-6 flex-wrap h-auto gap-1">
+        <Tabs defaultValue="listings" className="w-full">
+          <TabsList className="bg-secondary mb-6 flex-wrap h-auto gap-1 p-1">
             <TabsTrigger
-              value="pending"
+              value="listings"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               data-ocid="admin.tab"
             >
-              Pending ({pending.length})
+              Listings ({allProps.length})
+              {pending.length > 0 && (
+                <span className="ml-1.5 w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] font-bold inline-flex items-center justify-center">
+                  {pending.length}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger
-              value="approved"
+              value="contacts"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               data-ocid="admin.tab"
             >
-              Approved ({approved.length})
+              Owner Contacts
             </TabsTrigger>
             <TabsTrigger
-              value="rejected"
+              value="payments"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               data-ocid="admin.tab"
             >
-              Rejected ({rejected.length})
+              Payments
+              {pendingPayments.length > 0 && (
+                <span className="ml-1.5 w-4 h-4 rounded-full bg-orange-500 text-white text-[10px] font-bold inline-flex items-center justify-center">
+                  {pendingPayments.length}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger
               value="leads"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               data-ocid="admin.tab"
             >
-              Buyer Leads
+              Buyer Leads ({(leads ?? []).length})
             </TabsTrigger>
             <TabsTrigger
               value="brokers"
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground relative"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               data-ocid="admin.tab"
             >
               Brokers ({brokers.length})
               {pendingBrokers.length > 0 && (
-                <span className="ml-1.5 w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center inline-flex">
+                <span className="ml-1.5 w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] font-bold inline-flex items-center justify-center">
                   {pendingBrokers.length}
                 </span>
               )}
@@ -693,22 +991,39 @@ export default function AdminDashboard() {
           </TabsList>
 
           <TabsContent
-            value="pending"
+            value="listings"
             className="bg-card border border-border rounded-xl p-6"
           >
-            <PropertyTable items={pending} showPhone {...tableProps} />
+            <ListingsTab
+              properties={properties}
+              isLoading={propsLoading}
+              onApprove={handleApprove}
+              onReject={handleReject}
+              onConfirmPayment={handleConfirmPayment}
+              onToggleFeatured={handleToggleFeatured}
+              onDelete={handleDelete}
+            />
           </TabsContent>
+
           <TabsContent
-            value="approved"
+            value="contacts"
             className="bg-card border border-border rounded-xl p-6"
           >
-            <PropertyTable items={approved} {...tableProps} />
+            <OwnerContactsTab
+              properties={properties}
+              isLoading={propsLoading}
+            />
           </TabsContent>
+
           <TabsContent
-            value="rejected"
+            value="payments"
             className="bg-card border border-border rounded-xl p-6"
           >
-            <PropertyTable items={rejected} {...tableProps} />
+            <PaymentsTab
+              properties={properties}
+              isLoading={propsLoading}
+              onConfirmPayment={handleConfirmPayment}
+            />
           </TabsContent>
 
           <TabsContent
@@ -745,6 +1060,9 @@ export default function AdminDashboard() {
                       <TableHead className="text-muted-foreground">
                         Message
                       </TableHead>
+                      <TableHead className="text-muted-foreground">
+                        Date
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -768,6 +1086,17 @@ export default function AdminDashboard() {
                         </TableCell>
                         <TableCell className="text-muted-foreground max-w-[200px] truncate">
                           {lead.message}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-xs">
+                          {lead.createdAt
+                            ? new Date(
+                                Number(lead.createdAt) / 1_000_000,
+                              ).toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })
+                            : "—"}
                         </TableCell>
                       </TableRow>
                     ))}

@@ -19,6 +19,10 @@ export interface BuyerLead {
   'message' : string,
   'buyerName' : string,
 }
+export type ListingFeeType = { 'yearlyFee1000' : null } |
+  { 'twoMonthRentCommission' : null };
+export type ListingPurpose = { 'forRent' : null } |
+  { 'forSale' : null };
 export type PaymentStatus = { 'pending' : null } |
   { 'paid' : null };
 export interface Property {
@@ -30,12 +34,21 @@ export interface Property {
   'bedrooms' : bigint,
   'area' : bigint,
   'city' : string,
+  'rentAmount' : [] | [bigint],
   'submittedAt' : Time,
   'description' : string,
   'sellerInfo' : SellerInfo,
   'isFeatured' : boolean,
   'price' : bigint,
+  'listingPurpose' : ListingPurpose,
   'location' : string,
+}
+export interface PropertyFilter {
+  'propertyType' : [] | [string],
+  'city' : [] | [string],
+  'maxPrice' : [] | [bigint],
+  'minPrice' : [] | [bigint],
+  'listingPurpose' : [] | [ListingPurpose],
 }
 export type PropertyStatus = { 'pending' : null } |
   { 'approved' : null } |
@@ -43,6 +56,7 @@ export type PropertyStatus = { 'pending' : null } |
 export interface SellerInfo {
   'paymentStatus' : PaymentStatus,
   'sellerPhone' : [] | [string],
+  'listingFeeType' : ListingFeeType,
   'sellerName' : string,
   'paymentRef' : [] | [string],
 }
@@ -94,6 +108,8 @@ export interface _SERVICE {
   'listApprovedProperties' : ActorMethod<[], Array<Property>>,
   'recordPayment' : ActorMethod<[bigint, string], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'searchProperties' : ActorMethod<[PropertyFilter], Array<Property>>,
+  'setAdminPassword' : ActorMethod<[string], undefined>,
   'submitBuyerInquiry' : ActorMethod<
     [bigint, string, string, string, string],
     undefined
@@ -111,13 +127,15 @@ export interface _SERVICE {
       Array<string>,
       string,
       string,
+      ListingPurpose,
+      [] | [bigint],
+      ListingFeeType,
     ],
     undefined
   >,
   'toggleFeatured' : ActorMethod<[bigint], undefined>,
-  'verifyAdminPassword' : ActorMethod<[string], boolean>,
-  'setAdminPassword' : ActorMethod<[string], undefined>,
   'updatePropertyStatus' : ActorMethod<[bigint, PropertyStatus], undefined>,
+  'verifyAdminPassword' : ActorMethod<[string], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { BedDouble, MapPin, Maximize2 } from "lucide-react";
+import { ListingPurpose } from "../backend.d";
 import type { Property } from "../backend.d";
 import { formatPrice } from "../lib/formatPrice";
 import InquiryDialog from "./InquiryDialog";
@@ -15,6 +16,7 @@ const TYPE_COLORS: Record<string, string> = {
   "3BHK": "bg-purple-500/20 text-purple-300 border-purple-500/30",
   Villa: "bg-amber-500/20 text-amber-300 border-amber-500/30",
   Plot: "bg-red-500/20 text-red-300 border-red-500/30",
+  Commercial: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
 };
 
 export default function PropertyCard({ property, index }: PropertyCardProps) {
@@ -25,10 +27,15 @@ export default function PropertyCard({ property, index }: PropertyCardProps) {
     TYPE_COLORS[property.propertyType] ??
     "bg-muted text-muted-foreground border-border";
 
+  const isForRent = property.listingPurpose === ListingPurpose.forRent;
+  const displayPrice =
+    isForRent && property.rentAmount ? property.rentAmount : property.price;
+  const priceLabel = isForRent ? "/month" : "";
+
   return (
     <div
       data-ocid={`property.item.${index}`}
-      className="card-hover bg-card border border-border rounded-xl overflow-hidden group"
+      className="card-hover bg-card border border-border rounded-xl overflow-hidden group flex flex-col"
     >
       {/* Photo */}
       <div className="relative aspect-[4/3] overflow-hidden">
@@ -39,11 +46,20 @@ export default function PropertyCard({ property, index }: PropertyCardProps) {
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-3 left-3 flex gap-1.5">
           <span
             className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${typeColor}`}
           >
             {property.propertyType}
+          </span>
+          <span
+            className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
+              isForRent
+                ? "bg-orange-500/20 text-orange-300 border-orange-500/30"
+                : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+            }`}
+          >
+            {isForRent ? "For Rent" : "For Sale"}
           </span>
         </div>
         {property.isFeatured && (
@@ -55,13 +71,18 @@ export default function PropertyCard({ property, index }: PropertyCardProps) {
         )}
         <div className="absolute bottom-3 left-3">
           <span className="font-display font-bold text-xl text-white">
-            {formatPrice(property.price)}
+            {formatPrice(displayPrice)}
+            {priceLabel && (
+              <span className="text-sm font-normal ml-1 text-white/80">
+                {priceLabel}
+              </span>
+            )}
           </span>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <h3 className="font-display font-semibold text-foreground text-base leading-snug mb-2 line-clamp-2">
           {property.title}
         </h3>
@@ -87,7 +108,9 @@ export default function PropertyCard({ property, index }: PropertyCardProps) {
           </div>
         </div>
 
-        <InquiryDialog property={property} triggerIndex={index} />
+        <div className="mt-auto">
+          <InquiryDialog property={property} triggerIndex={index} />
+        </div>
       </div>
     </div>
   );

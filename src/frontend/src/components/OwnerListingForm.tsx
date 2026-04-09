@@ -14,6 +14,7 @@ import { ArrowLeft, Building2, CheckCircle2, ImagePlus, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { ListingFeeType, ListingPurpose } from "../backend.d";
 import { useSubmitProperty } from "../hooks/useQueries";
 
 const CITIES = [
@@ -90,6 +91,9 @@ export default function OwnerListingForm({ onBack }: Props) {
         photoUrls: previews.map((p) => p.src),
         sellerName: form.ownerName,
         sellerPhone: form.mobile,
+        listingPurpose: ListingPurpose.forSale,
+        rentAmount: null,
+        listingFeeType: ListingFeeType.yearlyFee1000,
       });
     } catch {
       // Backend unavailable, still show success (form data captured)

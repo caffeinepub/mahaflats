@@ -34,11 +34,20 @@ export const PaymentStatus = IDL.Variant({
   'pending' : IDL.Null,
   'paid' : IDL.Null,
 });
+export const ListingFeeType = IDL.Variant({
+  'yearlyFee1000' : IDL.Null,
+  'twoMonthRentCommission' : IDL.Null,
+});
 export const SellerInfo = IDL.Record({
   'paymentStatus' : PaymentStatus,
   'sellerPhone' : IDL.Opt(IDL.Text),
+  'listingFeeType' : ListingFeeType,
   'sellerName' : IDL.Text,
   'paymentRef' : IDL.Opt(IDL.Text),
+});
+export const ListingPurpose = IDL.Variant({
+  'forRent' : IDL.Null,
+  'forSale' : IDL.Null,
 });
 export const Property = IDL.Record({
   'id' : IDL.Nat,
@@ -49,11 +58,13 @@ export const Property = IDL.Record({
   'bedrooms' : IDL.Nat,
   'area' : IDL.Nat,
   'city' : IDL.Text,
+  'rentAmount' : IDL.Opt(IDL.Nat),
   'submittedAt' : Time,
   'description' : IDL.Text,
   'sellerInfo' : SellerInfo,
   'isFeatured' : IDL.Bool,
   'price' : IDL.Nat,
+  'listingPurpose' : ListingPurpose,
   'location' : IDL.Text,
 });
 export const BuyerLead = IDL.Record({
@@ -66,6 +77,13 @@ export const BuyerLead = IDL.Record({
   'buyerName' : IDL.Text,
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
+export const PropertyFilter = IDL.Record({
+  'propertyType' : IDL.Opt(IDL.Text),
+  'city' : IDL.Opt(IDL.Text),
+  'maxPrice' : IDL.Opt(IDL.Nat),
+  'minPrice' : IDL.Opt(IDL.Nat),
+  'listingPurpose' : IDL.Opt(ListingPurpose),
+});
 
 export const idlService = IDL.Service({
   '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -118,6 +136,12 @@ export const idlService = IDL.Service({
   'listApprovedProperties' : IDL.Func([], [IDL.Vec(Property)], ['query']),
   'recordPayment' : IDL.Func([IDL.Nat, IDL.Text], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'searchProperties' : IDL.Func(
+      [PropertyFilter],
+      [IDL.Vec(Property)],
+      ['query'],
+    ),
+  'setAdminPassword' : IDL.Func([IDL.Text], [], []),
   'submitBuyerInquiry' : IDL.Func(
       [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
       [],
@@ -136,14 +160,16 @@ export const idlService = IDL.Service({
         IDL.Vec(IDL.Text),
         IDL.Text,
         IDL.Text,
+        ListingPurpose,
+        IDL.Opt(IDL.Nat),
+        ListingFeeType,
       ],
       [],
       [],
     ),
   'toggleFeatured' : IDL.Func([IDL.Nat], [], []),
-  'verifyAdminPassword' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
-  'setAdminPassword' : IDL.Func([IDL.Text], [], []),
   'updatePropertyStatus' : IDL.Func([IDL.Nat, PropertyStatus], [], []),
+  'verifyAdminPassword' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
 });
 
 export const idlInitArgs = [];
@@ -175,11 +201,20 @@ export const idlFactory = ({ IDL }) => {
     'pending' : IDL.Null,
     'paid' : IDL.Null,
   });
+  const ListingFeeType = IDL.Variant({
+    'yearlyFee1000' : IDL.Null,
+    'twoMonthRentCommission' : IDL.Null,
+  });
   const SellerInfo = IDL.Record({
     'paymentStatus' : PaymentStatus,
     'sellerPhone' : IDL.Opt(IDL.Text),
+    'listingFeeType' : ListingFeeType,
     'sellerName' : IDL.Text,
     'paymentRef' : IDL.Opt(IDL.Text),
+  });
+  const ListingPurpose = IDL.Variant({
+    'forRent' : IDL.Null,
+    'forSale' : IDL.Null,
   });
   const Property = IDL.Record({
     'id' : IDL.Nat,
@@ -190,11 +225,13 @@ export const idlFactory = ({ IDL }) => {
     'bedrooms' : IDL.Nat,
     'area' : IDL.Nat,
     'city' : IDL.Text,
+    'rentAmount' : IDL.Opt(IDL.Nat),
     'submittedAt' : Time,
     'description' : IDL.Text,
     'sellerInfo' : SellerInfo,
     'isFeatured' : IDL.Bool,
     'price' : IDL.Nat,
+    'listingPurpose' : ListingPurpose,
     'location' : IDL.Text,
   });
   const BuyerLead = IDL.Record({
@@ -207,6 +244,13 @@ export const idlFactory = ({ IDL }) => {
     'buyerName' : IDL.Text,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
+  const PropertyFilter = IDL.Record({
+    'propertyType' : IDL.Opt(IDL.Text),
+    'city' : IDL.Opt(IDL.Text),
+    'maxPrice' : IDL.Opt(IDL.Nat),
+    'minPrice' : IDL.Opt(IDL.Nat),
+    'listingPurpose' : IDL.Opt(ListingPurpose),
+  });
   
   return IDL.Service({
     '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -259,6 +303,12 @@ export const idlFactory = ({ IDL }) => {
     'listApprovedProperties' : IDL.Func([], [IDL.Vec(Property)], ['query']),
     'recordPayment' : IDL.Func([IDL.Nat, IDL.Text], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'searchProperties' : IDL.Func(
+        [PropertyFilter],
+        [IDL.Vec(Property)],
+        ['query'],
+      ),
+    'setAdminPassword' : IDL.Func([IDL.Text], [], []),
     'submitBuyerInquiry' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
         [],
@@ -277,12 +327,16 @@ export const idlFactory = ({ IDL }) => {
           IDL.Vec(IDL.Text),
           IDL.Text,
           IDL.Text,
+          ListingPurpose,
+          IDL.Opt(IDL.Nat),
+          ListingFeeType,
         ],
         [],
         [],
       ),
     'toggleFeatured' : IDL.Func([IDL.Nat], [], []),
     'updatePropertyStatus' : IDL.Func([IDL.Nat, PropertyStatus], [], []),
+    'verifyAdminPassword' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
   });
 };
 

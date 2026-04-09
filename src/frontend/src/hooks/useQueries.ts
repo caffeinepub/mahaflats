@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PaymentStatus } from "../backend.d";
-import type { BuyerLead, Property, PropertyStatus } from "../backend.d";
+import { ListingFeeType, ListingPurpose, PaymentStatus } from "../backend.d";
+import type {
+  BuyerLead,
+  Property,
+  PropertyFilter,
+  PropertyStatus,
+} from "../backend.d";
 import { useActor } from "./useActor";
 
 const SAMPLE_PROPERTIES: Property[] = [
@@ -21,7 +26,12 @@ const SAMPLE_PROPERTIES: Property[] = [
     isFeatured: true,
     status: "approved" as PropertyStatus,
     submittedAt: 0n,
-    sellerInfo: { sellerName: "Demo", paymentStatus: PaymentStatus.paid },
+    listingPurpose: ListingPurpose.forSale,
+    sellerInfo: {
+      sellerName: "Demo",
+      paymentStatus: PaymentStatus.paid,
+      listingFeeType: ListingFeeType.yearlyFee1000,
+    },
   },
   {
     id: 2n,
@@ -40,7 +50,12 @@ const SAMPLE_PROPERTIES: Property[] = [
     isFeatured: true,
     status: "approved" as PropertyStatus,
     submittedAt: 0n,
-    sellerInfo: { sellerName: "Demo", paymentStatus: PaymentStatus.paid },
+    listingPurpose: ListingPurpose.forSale,
+    sellerInfo: {
+      sellerName: "Demo",
+      paymentStatus: PaymentStatus.paid,
+      listingFeeType: ListingFeeType.yearlyFee1000,
+    },
   },
   {
     id: 3n,
@@ -59,7 +74,12 @@ const SAMPLE_PROPERTIES: Property[] = [
     isFeatured: false,
     status: "approved" as PropertyStatus,
     submittedAt: 0n,
-    sellerInfo: { sellerName: "Demo", paymentStatus: PaymentStatus.paid },
+    listingPurpose: ListingPurpose.forSale,
+    sellerInfo: {
+      sellerName: "Demo",
+      paymentStatus: PaymentStatus.paid,
+      listingFeeType: ListingFeeType.yearlyFee1000,
+    },
   },
   {
     id: 4n,
@@ -78,7 +98,12 @@ const SAMPLE_PROPERTIES: Property[] = [
     isFeatured: true,
     status: "approved" as PropertyStatus,
     submittedAt: 0n,
-    sellerInfo: { sellerName: "Demo", paymentStatus: PaymentStatus.paid },
+    listingPurpose: ListingPurpose.forSale,
+    sellerInfo: {
+      sellerName: "Demo",
+      paymentStatus: PaymentStatus.paid,
+      listingFeeType: ListingFeeType.yearlyFee1000,
+    },
   },
   {
     id: 5n,
@@ -97,7 +122,13 @@ const SAMPLE_PROPERTIES: Property[] = [
     isFeatured: false,
     status: "approved" as PropertyStatus,
     submittedAt: 0n,
-    sellerInfo: { sellerName: "Demo", paymentStatus: PaymentStatus.paid },
+    listingPurpose: ListingPurpose.forRent,
+    rentAmount: 25000n,
+    sellerInfo: {
+      sellerName: "Demo",
+      paymentStatus: PaymentStatus.paid,
+      listingFeeType: ListingFeeType.twoMonthRentCommission,
+    },
   },
   {
     id: 6n,
@@ -116,7 +147,12 @@ const SAMPLE_PROPERTIES: Property[] = [
     isFeatured: true,
     status: "approved" as PropertyStatus,
     submittedAt: 0n,
-    sellerInfo: { sellerName: "Demo", paymentStatus: PaymentStatus.paid },
+    listingPurpose: ListingPurpose.forSale,
+    sellerInfo: {
+      sellerName: "Demo",
+      paymentStatus: PaymentStatus.paid,
+      listingFeeType: ListingFeeType.yearlyFee1000,
+    },
   },
   {
     id: 7n,
@@ -135,7 +171,12 @@ const SAMPLE_PROPERTIES: Property[] = [
     isFeatured: false,
     status: "approved" as PropertyStatus,
     submittedAt: 0n,
-    sellerInfo: { sellerName: "Demo", paymentStatus: PaymentStatus.paid },
+    listingPurpose: ListingPurpose.forSale,
+    sellerInfo: {
+      sellerName: "Demo",
+      paymentStatus: PaymentStatus.paid,
+      listingFeeType: ListingFeeType.yearlyFee1000,
+    },
   },
   {
     id: 8n,
@@ -154,7 +195,12 @@ const SAMPLE_PROPERTIES: Property[] = [
     isFeatured: false,
     status: "approved" as PropertyStatus,
     submittedAt: 0n,
-    sellerInfo: { sellerName: "Demo", paymentStatus: PaymentStatus.paid },
+    listingPurpose: ListingPurpose.forSale,
+    sellerInfo: {
+      sellerName: "Demo",
+      paymentStatus: PaymentStatus.paid,
+      listingFeeType: ListingFeeType.yearlyFee1000,
+    },
   },
 ];
 
@@ -185,6 +231,49 @@ export function useFeaturedProperties() {
     },
     enabled: !isFetching,
     placeholderData: SAMPLE_PROPERTIES.filter((p) => p.isFeatured),
+  });
+}
+
+export function useSearchProperties(filter: PropertyFilter, enabled: boolean) {
+  const { actor, isFetching } = useActor();
+  return useQuery<Property[]>({
+    queryKey: ["searchProperties", JSON.stringify(filter)],
+    queryFn: async () => {
+      if (!actor) {
+        // Client-side filter on sample data
+        return SAMPLE_PROPERTIES.filter((p) => {
+          if (filter.city && p.city !== filter.city) return false;
+          if (filter.propertyType && p.propertyType !== filter.propertyType)
+            return false;
+          if (filter.minPrice && p.price < filter.minPrice) return false;
+          if (filter.maxPrice && p.price > filter.maxPrice) return false;
+          if (
+            filter.listingPurpose &&
+            p.listingPurpose !== filter.listingPurpose
+          )
+            return false;
+          return true;
+        });
+      }
+      const result = await actor.searchProperties(filter);
+      if (result.length === 0) {
+        return SAMPLE_PROPERTIES.filter((p) => {
+          if (filter.city && p.city !== filter.city) return false;
+          if (filter.propertyType && p.propertyType !== filter.propertyType)
+            return false;
+          if (filter.minPrice && p.price < filter.minPrice) return false;
+          if (filter.maxPrice && p.price > filter.maxPrice) return false;
+          if (
+            filter.listingPurpose &&
+            p.listingPurpose !== filter.listingPurpose
+          )
+            return false;
+          return true;
+        });
+      }
+      return result;
+    },
+    enabled: !isFetching && enabled,
   });
 }
 
@@ -263,6 +352,9 @@ export function useSubmitProperty() {
       photoUrls: string[];
       sellerName: string;
       sellerPhone: string;
+      listingPurpose: ListingPurpose;
+      rentAmount: bigint | null;
+      listingFeeType: ListingFeeType;
     }) => {
       if (!actor) throw new Error("Not connected");
       return actor.submitProperty(
@@ -277,6 +369,9 @@ export function useSubmitProperty() {
         data.photoUrls,
         data.sellerName,
         data.sellerPhone,
+        data.listingPurpose,
+        data.rentAmount,
+        data.listingFeeType,
       );
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["approvedProperties"] }),

@@ -7,15 +7,27 @@ import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 import Order "mo:core/Order";
+import Migration "migration";
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
+(with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
   include MixinStorage();
+
+  public type ListingPurpose = {
+    #forSale;
+    #forRent;
+  };
+
+  public type ListingFeeType = {
+    #yearlyFee1000;
+    #twoMonthRentCommission;
+  };
 
   public type PropertyStatus = {
     #pending;
@@ -33,6 +45,7 @@ actor {
     sellerPhone : ?Text;
     paymentRef : ?Text;
     paymentStatus : PaymentStatus;
+    listingFeeType : ListingFeeType;
   };
 
   public type Property = {
@@ -49,6 +62,8 @@ actor {
     isFeatured : Bool;
     status : PropertyStatus;
     submittedAt : Time.Time;
+    listingPurpose : ListingPurpose;
+    rentAmount : ?Nat;
     sellerInfo : SellerInfo;
   };
 
@@ -64,6 +79,14 @@ actor {
 
   public type UserProfile = {
     name : Text;
+  };
+
+  public type PropertyFilter = {
+    city : ?Text;
+    maxPrice : ?Nat;
+    minPrice : ?Nat;
+    propertyType : ?Text;
+    listingPurpose : ?ListingPurpose;
   };
 
   module Property {
@@ -133,6 +156,45 @@ actor {
     );
   };
 
+  public query ({ caller }) func searchProperties(filter : PropertyFilter) : async [Property] {
+    properties.values().toArray().filter(
+      func(p) {
+        var matches = true;
+        switch (filter.city) {
+          case (null) {};
+          case (?c) {
+            matches := matches and p.city.contains(#text(c));
+          };
+        };
+        switch (filter.maxPrice) {
+          case (null) {};
+          case (?max) {
+            matches := matches and p.price <= max;
+          };
+        };
+        switch (filter.minPrice) {
+          case (null) {};
+          case (?min) {
+            matches := matches and p.price >= min;
+          };
+        };
+        switch (filter.propertyType) {
+          case (null) {};
+          case (?ptype) {
+            matches := matches and p.propertyType.contains(#text(ptype));
+          };
+        };
+        switch (filter.listingPurpose) {
+          case (null) {};
+          case (?purpose) {
+            matches := matches and p.listingPurpose == purpose;
+          };
+        };
+        matches and p.status == #approved
+      }
+    );
+  };
+
   public shared ({ caller }) func submitProperty(
     title : Text,
     city : Text,
@@ -144,7 +206,10 @@ actor {
     description : Text,
     photoUrls : [Text],
     sellerName : Text,
-    sellerPhone : Text
+    sellerPhone : Text,
+    listingPurpose : ListingPurpose,
+    rentAmount : ?Nat,
+    listingFeeType : ListingFeeType
   ) : async () {
     let property : Property = {
       id = nextPropertyId;
@@ -160,11 +225,14 @@ actor {
       isFeatured = false;
       status = #pending;
       submittedAt = Time.now();
+      listingPurpose;
+      rentAmount;
       sellerInfo = {
         sellerName;
         sellerPhone = ?sellerPhone;
         paymentRef = null;
         paymentStatus = #pending;
+        listingFeeType;
       };
     };
     properties.add(nextPropertyId, property);
@@ -209,11 +277,14 @@ actor {
           isFeatured = property.isFeatured;
           status = property.status;
           submittedAt = property.submittedAt;
+          listingPurpose = property.listingPurpose;
+          rentAmount = property.rentAmount;
           sellerInfo = {
             sellerName = property.sellerInfo.sellerName;
             sellerPhone = property.sellerInfo.sellerPhone;
             paymentRef = ?paymentRef;
             paymentStatus = property.sellerInfo.paymentStatus;
+            listingFeeType = property.sellerInfo.listingFeeType;
           };
         };
         properties.add(propertyId, updatedProperty);
@@ -261,6 +332,8 @@ actor {
           isFeatured = property.isFeatured;
           status = newStatus;
           submittedAt = property.submittedAt;
+          listingPurpose = property.listingPurpose;
+          rentAmount = property.rentAmount;
           sellerInfo = property.sellerInfo;
         };
         properties.add(propertyId, updatedProperty);
@@ -289,11 +362,14 @@ actor {
           isFeatured = property.isFeatured;
           status = #approved;
           submittedAt = property.submittedAt;
+          listingPurpose = property.listingPurpose;
+          rentAmount = property.rentAmount;
           sellerInfo = {
             sellerName = property.sellerInfo.sellerName;
             sellerPhone = property.sellerInfo.sellerPhone;
             paymentRef = property.sellerInfo.paymentRef;
             paymentStatus = #paid;
+            listingFeeType = property.sellerInfo.listingFeeType;
           };
         };
         properties.add(propertyId, updatedProperty);
@@ -329,6 +405,8 @@ actor {
           isFeatured = not property.isFeatured;
           status = property.status;
           submittedAt = property.submittedAt;
+          listingPurpose = property.listingPurpose;
+          rentAmount = property.rentAmount;
           sellerInfo = property.sellerInfo;
         };
         properties.add(propertyId, updatedProperty);
@@ -346,8 +424,11 @@ actor {
     properties.remove(propertyId);
   };
 
-  // Admin password verification
-  public query func verifyAdminPassword(password : Text) : async Bool {
+  // Admin password verification - ADMIN ONLY
+  public query ({ caller }) func verifyAdminPassword(password : Text) : async Bool {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can verify the admin password");
+    };
     password == adminPassword;
   };
 

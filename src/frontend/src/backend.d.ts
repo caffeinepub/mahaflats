@@ -7,6 +7,14 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
+export type Time = bigint;
+export interface SellerInfo {
+    paymentStatus: PaymentStatus;
+    sellerPhone?: string;
+    listingFeeType: ListingFeeType;
+    sellerName: string;
+    paymentRef?: string;
+}
 export interface Property {
     id: bigint;
     status: PropertyStatus;
@@ -16,14 +24,15 @@ export interface Property {
     bedrooms: bigint;
     area: bigint;
     city: string;
+    rentAmount?: bigint;
     submittedAt: Time;
     description: string;
     sellerInfo: SellerInfo;
     isFeatured: boolean;
     price: bigint;
+    listingPurpose: ListingPurpose;
     location: string;
 }
-export type Time = bigint;
 export interface BuyerLead {
     id: bigint;
     buyerEmail: string;
@@ -33,14 +42,23 @@ export interface BuyerLead {
     message: string;
     buyerName: string;
 }
-export interface SellerInfo {
-    paymentStatus: PaymentStatus;
-    sellerPhone?: string;
-    sellerName: string;
-    paymentRef?: string;
+export interface PropertyFilter {
+    propertyType?: string;
+    city?: string;
+    maxPrice?: bigint;
+    minPrice?: bigint;
+    listingPurpose?: ListingPurpose;
 }
 export interface UserProfile {
     name: string;
+}
+export enum ListingFeeType {
+    yearlyFee1000 = "yearlyFee1000",
+    twoMonthRentCommission = "twoMonthRentCommission"
+}
+export enum ListingPurpose {
+    forRent = "forRent",
+    forSale = "forSale"
 }
 export enum PaymentStatus {
     pending = "pending",
@@ -69,13 +87,14 @@ export interface backendInterface {
     getSellerPhone(propertyId: bigint): Promise<string | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
-    verifyAdminPassword(password: string): Promise<boolean>;
-    setAdminPassword(newPassword: string): Promise<void>;
     listApprovedProperties(): Promise<Array<Property>>;
     recordPayment(propertyId: bigint, paymentRef: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    searchProperties(filter: PropertyFilter): Promise<Array<Property>>;
+    setAdminPassword(newPassword: string): Promise<void>;
     submitBuyerInquiry(propertyId: bigint, buyerName: string, buyerPhone: string, buyerEmail: string, message: string): Promise<void>;
-    submitProperty(title: string, city: string, location: string, propertyType: string, price: bigint, area: bigint, bedrooms: bigint, description: string, photoUrls: Array<string>, sellerName: string, sellerPhone: string): Promise<void>;
+    submitProperty(title: string, city: string, location: string, propertyType: string, price: bigint, area: bigint, bedrooms: bigint, description: string, photoUrls: Array<string>, sellerName: string, sellerPhone: string, listingPurpose: ListingPurpose, rentAmount: bigint | null, listingFeeType: ListingFeeType): Promise<void>;
     toggleFeatured(propertyId: bigint): Promise<void>;
     updatePropertyStatus(propertyId: bigint, newStatus: PropertyStatus): Promise<void>;
+    verifyAdminPassword(password: string): Promise<boolean>;
 }
